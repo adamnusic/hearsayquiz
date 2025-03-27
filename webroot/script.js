@@ -1175,7 +1175,7 @@ function optimizeGamePlayLayout() {
     celebritiesContainer.style.boxSizing = 'border-box';
     celebritiesContainer.style.paddingBottom = '20px';
     celebritiesContainer.style.marginTop = '5px';
-    celebritiesContainer.style.maxHeight = 'calc(100vh - 170px)';
+    celebritiesContainer.style.maxHeight = 'calc(100vh - 150px)';  // Increased from 170px to 150px
     celebritiesContainer.style.overflowY = 'auto';
   }
   
@@ -1549,8 +1549,10 @@ function showGameResults(selectedCelebrity) {
     window.logDiagnostic("Removed existing audio loading overlay");
   }
   
-  // Play the appropriate feedback sound
-  playFeedbackSound(isCorrect);
+  // Play the appropriate feedback sound after a short delay to ensure clean separation
+  setTimeout(() => {
+    playFeedbackSound(isCorrect);
+  }, 500);
   
   try {
     // Get references to result screen elements - try both direct IDs and window variables
@@ -2479,10 +2481,12 @@ window.createCelebrityButtons = function() {
   container.style.gridTemplateColumns = 'repeat(2, 1fr)';
   container.style.gap = '0.6rem'; // Further reduced gap
   container.style.width = '100%';
-  container.style.margin = '8px 0 0 0'; // Added top margin to separate from quote
-  container.style.padding = '0';
+  container.style.margin = '16px 0 0 0'; // Increased from 8px to 16px
+  container.style.padding = '8px 0'; // Added vertical padding
   container.style.border = 'none';
   container.style.boxSizing = 'border-box';
+  container.style.maxHeight = 'calc(100vh - 150px)';
+  container.style.overflowY = 'auto';
   
   // Create celebrity buttons with real audio paths
   const celebrities = [
@@ -2878,7 +2882,7 @@ window.testReceiveGameData = function() {
     celebritiesContainer.style.width = '100%';
     celebritiesContainer.style.boxSizing = 'border-box';
     celebritiesContainer.style.paddingBottom = '20px';
-    celebritiesContainer.style.maxHeight = 'calc(100vh - 170px)';
+    celebritiesContainer.style.maxHeight = 'calc(100vh - 150px)';  // Increased from 170px to 150px
     celebritiesContainer.style.overflowY = 'auto';
     
     // Get or create category display (even though it's hidden)
@@ -3037,7 +3041,7 @@ window.testReceiveGameData = function() {
         
         // Add hover effects
         button.addEventListener('mouseover', () => {
-          button.style.transform = 'translateY(-2px)';
+          button.style.transform = 'translateY(0)';  // Removed transform
           button.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.4)';
           button.style.borderColor = 'white';
           imgContainer.style.transform = 'scale(1.1)';
@@ -3326,12 +3330,12 @@ function createButtonsFromQuoteData(quoteData) {
   containerEl.style.gridTemplateColumns = 'repeat(2, 1fr)';
   containerEl.style.gap = '0.6rem'; // Further reduced gap
   containerEl.style.width = '100%';
-  containerEl.style.margin = '8px 0 0 0'; // Added top margin to separate from quote
-  containerEl.style.padding = '0';
+  containerEl.style.margin = '16px 0 0 0'; // Increased from 8px to 16px
+  containerEl.style.padding = '8px 0'; // Added vertical padding
   containerEl.style.border = 'none';
   containerEl.style.boxSizing = 'border-box';
-  containerEl.style.maxHeight = 'calc(100vh - 150px)'; // Limit height to ensure it fits in viewport
-  containerEl.style.overflowY = 'auto'; // Allow scrolling if needed
+  containerEl.style.maxHeight = 'calc(100vh - 150px)';
+  containerEl.style.overflowY = 'auto';
   
   // Create a button for each celebrity
   celebrities.forEach(celebrity => {
@@ -3428,7 +3432,7 @@ function createButtonsFromQuoteData(quoteData) {
       
       // Add enhanced hover effects
       button.addEventListener('mouseover', () => {
-        button.style.transform = 'translateY(-2px)';
+        button.style.transform = 'translateY(0)';  // Removed transform
         button.style.boxShadow = '0 5px 10px rgba(0, 0, 0, 0.4)';
         button.style.borderColor = 'white';
         imgContainer.style.transform = 'scale(1.1)';
