@@ -1,12 +1,13 @@
 import './createPost.js';
 
-import { Devvit, useState, useWebView } from '@devvit/public-api';
+import { Devvit, useState, useWebView, useEffect } from '@devvit/public-api';
 
 import type { DevvitMessage, WebViewMessage, QuoteData } from './message.js';
 
 Devvit.configure({
   redditAPI: true,
   redis: true,
+  media: true
 });
 
 // Categories for the game
@@ -117,16 +118,26 @@ Devvit.addCustomPostType({
   name: 'Hear Say!? Game',
   height: 'tall',
   render: (context) => {
-    // Load username with `useAsync` hook
-    const [username] = useState(async () => {
-      return (await context.reddit.getCurrentUsername()) ?? 'anon';
-    });
+    // Load username and score with useState
+    const [username, setUsername] = useState<string>('Loading...');
+    const [score, setScore] = useState<number>(0);
 
-    // Load user's score from redis with `useAsync` hook
-    const [score, setScore] = useState(async () => {
-      const redisScore = await context.redis.get(`hearsay_score_${username}`);
-      return Number(redisScore ?? 0);
-    });
+    // Load initial data when webview is ready
+    const loadInitialData = async () => {
+      try {
+        // Get username
+        const currentUsername = await context.reddit.getCurrentUsername() ?? 'anon';
+        setUsername(currentUsername);
+        console.log('Loaded username:', currentUsername);
+
+        // Get score from Redis
+        const redisScore = await context.redis.get(`hearsay_score_${currentUsername}`);
+        console.log('Loaded score from Redis:', redisScore);
+        setScore(Number(redisScore ?? 0));
+      } catch (error) {
+        console.error('Error loading initial data:', error);
+      }
+    };
 
     // Track the selected category
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -166,7 +177,9 @@ Devvit.addCustomPostType({
         
         switch (message.type) {
           case 'webViewReady':
-            console.log('Web view is ready, sending initial data');
+            console.log('Web view is ready, loading initial data');
+            await loadInitialData();
+            
             webView.postMessage({
               type: 'initialData',
               data: {
@@ -201,6 +214,12 @@ Devvit.addCustomPostType({
             if (message.data.correct) {
               // If correct, update the score
               const newScore = score + message.data.score;
+              console.log('Updating score in Redis:', {
+                username,
+                oldScore: score,
+                newScore,
+                key: `hearsay_score_${username}`
+              });
               await context.redis.set(`hearsay_score_${username}`, newScore.toString());
               setScore(newScore);
             }
@@ -259,26 +278,36 @@ Devvit.addCustomPostType({
           alignment="middle center" 
           padding="large"
           cornerRadius="medium"
+          minWidth="400px"
+          minHeight="500px"
         >
+          <icon 
+            name="topic-celebrity"
+            size="large"
+            color="#F5F834"
+          />
+          
+          <spacer size="medium" />
+          
           <text size="xlarge" weight="bold" color="white">
             Hear Say!?
           </text>
           
           <hstack gap="small">
-            <text size="medium" color="white">Player: </text>
-            <text size="medium" weight="bold" color="#F5F834">
+            <text size="xlarge" color="white">Player: </text>
+            <text size="xlarge" weight="bold" color="#F5F834">
               {username ?? ''}
             </text>
-            <text size="medium" color="white"> | Score: </text>
-            <text size="medium" weight="bold" color="#F5F834">
+            <text size="xlarge" color="white"> | Score: </text>
+            <text size="xlarge" weight="bold" color="#F5F834">
               {score ?? '0'}
             </text>
           </hstack>
           
           <spacer size="medium" />
           
-          <text size="medium" color="white" alignment="middle">
-            Choose a category to test your knowledge of celebrity quotes!
+          <text size="xlarge" color="white" alignment="middle">
+            Test your knowledge of not-so-famous quotes from famous people!
           </text>
           
           <spacer size="medium" />
