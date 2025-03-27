@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui, shrink-to-fit=no, viewport-fit=cover"
+    />
+    <meta charset="UTF-8" />
+    <title>Hear Say!? - Who Said That?</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* Background wrapper that will work in Devvit blocks */
+      #background-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background-color: #121212;
+        background-image: url('../assets/hearsay-bg.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        pointer-events: none;
+      }
+      
+      /* Reset body styles for better fit in webview */
+      body {
+        background: transparent !important;
+        color: white !important;
+        padding: 12px !important;
+        overflow-x: hidden !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+        min-height: calc(100vh - 24px) !important;
+      }
+      
+      /* Make all game screens transparent with text readable against dark background */
+      .game-screen {
+        background-color: rgba(0, 0, 0, 0.7) !important;
+        color: white !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5) !important;
+      }
+      
+      /* Make all headings white for readability against dark background */
+      h1, h2, h3 {
+        color: white !important;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7) !important;
+      }
+      
+      /* Ensure the game container is transparent */
+      #game-container {
+        background-color: transparent !important;
+        position: relative;
+        z-index: 1;
+      }
+      
+      /* Make sure quote container is readable */
+      #quote-container {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+        color: white !important;
+      }
+      
+      /* Ensure player and score are visible */
+      #username, #score {
+        color: #60a5fa !important;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Background wrapper -->
+    <div id="background-wrapper"></div>
+    
+    <div id="game-container">
+      <!-- Removed h1 and h3 elements to save space -->
+      
+      <div id="category-select" class="game-screen">
+        <div class="category-container">
+          <button class="category-button" data-category="Music">
+            <span class="category-emoji">🎵</span>
+            <span>Music</span>
+          </button>
+          <button class="category-button" data-category="Politics">
+            <span class="category-emoji">🏛️</span>
+            <span>Politics</span>
+          </button>
+          <button class="category-button" data-category="Movies">
+            <span class="category-emoji">🎬</span>
+            <span>Movies</span>
+          </button>
+          <button class="category-button" data-category="History">
+            <span class="category-emoji">📜</span>
+            <span>History</span>
+          </button>
+          <button class="category-button" data-category="Sports">
+            <span class="category-emoji">⚽</span>
+            <span>Sports</span>
+          </button>
+          <button class="category-button" data-category="Academia">
+            <span class="category-emoji">🎓</span>
+            <span>Academia</span>
+          </button>
+        </div>
+        <button id="show-leaderboard" class="secondary-button">View Leaderboard</button>
+      </div>
+      
+      <div id="game-play" class="game-screen">
+        <div id="category-display">Category: <span id="current-category">Music</span></div>
+        
+        <div id="quote-container">
+          <h2>Who said this?</h2>
+          <div id="quote-text">"Quote will appear here"</div>
+        </div>
+        
+        <div id="celebrities-container">
+          <div id="loading-message">Loading celebrities...</div>
+        </div>
+        
+        <div id="timer-container">
+          <div id="timer-bar"></div>
+          <div id="timer-text">20</div>
+        </div>
+      </div>
+      
+      <div id="game-result" class="game-screen">
+        <h2 id="result-message">Correct!</h2>
+        <div id="result-details">
+          <p>The quote was said by <span id="correct-celebrity">Celebrity Name</span></p>
+          <p>You selected <span id="selected-celebrity">Celebrity Name</span></p>
+        </div>
+        <div id="score-feedback">
+          <p>Points earned: <span id="points-earned">0</span></p>
+        </div>
+        <button id="next-category">Choose Next Category</button>
+        <button id="play-again">Play Same Category Again</button>
+      </div>
+      
+      <div id="leaderboard-screen" class="game-screen">
+        <h2>Leaderboard</h2>
+        <div id="leaderboard-container">
+          <div class="leaderboard-item header">
+            <span class="rank">Rank</span>
+            <span class="player">Player</span>
+            <span class="high-score">Score</span>
+          </div>
+          <div id="leaderboard-entries"></div>
+        </div>
+        <button id="back-to-categories" class="secondary-button">Back to Categories</button>
+      </div>
+      
+      <!-- Hidden audio elements -->
+      <audio id="quote-audio" preload="none"></audio>
+      <audio id="correct-audio" src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==" preload="auto"></audio>
+      <audio id="incorrect-audio" src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==" preload="auto"></audio>
+    </div>
+    
+    <script type="application/javascript" src="script.js"></script>
+  </body>
+</html>
