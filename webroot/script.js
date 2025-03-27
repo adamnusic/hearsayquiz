@@ -2539,7 +2539,7 @@ window.createCelebrityButtons = function() {
     button.className = 'celebrity-button';
     
     // Match the category button styling but with dark background and yellow outline
-    button.style.padding = '0.95rem 0.5rem'; // Further reduced padding by ~20%
+    button.style.padding = '0.7rem 0.2rem'; // Further reduced padding by ~20%
     button.style.border = '2px solid var(--primary-color, #F5F834)'; // Reduced border thickness
     button.style.borderRadius = 'var(--border-radius, 6px)'; // Smaller border radius
     button.style.backgroundColor = '#121212'; // Dark background
@@ -2599,11 +2599,11 @@ window.createCelebrityButtons = function() {
     
     // Create image element for celebrity - FURTHER REDUCED SIZE
     const imgContainer = document.createElement('div');
-    imgContainer.style.width = '55px'; // Further reduced from 70px
-    imgContainer.style.height = '55px'; // Further reduced from 70px
+    imgContainer.style.width = '70px'; // Further reduced from 70px
+    imgContainer.style.height = '70px'; // Further reduced from 70px
     imgContainer.style.borderRadius = '50%';
     imgContainer.style.overflow = 'hidden';
-    imgContainer.style.marginBottom = '0.3rem';
+    imgContainer.style.marginBottom = '0.2rem';
     imgContainer.style.backgroundColor = '#333'; // Darker background for placeholders
     imgContainer.style.display = 'flex';
     imgContainer.style.justifyContent = 'center';
@@ -2957,7 +2957,7 @@ window.testReceiveGameData = function() {
         button.className = 'celebrity-button';
         
         // Style the button
-        button.style.padding = '0.8rem 0.5rem';
+        button.style.padding = '0.7rem 0.2rem';
         button.style.backgroundColor = '#121212';
         button.style.color = 'white';
         button.style.border = '2px solid #F5F834';
@@ -2978,11 +2978,11 @@ window.testReceiveGameData = function() {
         
         // Create image container
         const imgContainer = document.createElement('div');
-        imgContainer.style.width = '52px';
-        imgContainer.style.height = '52px';
-        imgContainer.style.borderRadius = '50%';
+        imgContainer.style.width = '70px';
+        imgContainer.style.height = '70px';
+        imgContainer.style.borderRadius = '12px'; // Changed from 50% to 12px for rounded corners
         imgContainer.style.overflow = 'hidden';
-        imgContainer.style.marginBottom = '0.3rem';
+        imgContainer.style.marginBottom = '0.2rem';
         imgContainer.style.backgroundColor = getRandomColor(celeb);
         imgContainer.style.display = 'flex';
         imgContainer.style.justifyContent = 'center';
@@ -3340,7 +3340,7 @@ function createButtonsFromQuoteData(quoteData) {
       button.className = 'celebrity-button';
       
       // Match the category button styling but with dark background and yellow outline
-      button.style.padding = '0.8rem 0.5rem'; // Further reduced padding
+      button.style.padding = '0.7rem 0.2rem'; // Further reduced padding
       button.style.border = '2px solid var(--primary-color, #F5F834)';
       button.style.borderRadius = 'var(--border-radius, 6px)';
       button.style.backgroundColor = '#121212'; // Dark background
@@ -3363,11 +3363,11 @@ function createButtonsFromQuoteData(quoteData) {
       
       // Create image container
       const imgContainer = document.createElement('div');
-      imgContainer.style.width = '52px'; // Even smaller image container
-      imgContainer.style.height = '52px';
-      imgContainer.style.borderRadius = '50%';
+      imgContainer.style.width = '70px';
+      imgContainer.style.height = '70px';
+      imgContainer.style.borderRadius = '12px'; // Changed from 50% to 12px for rounded corners
       imgContainer.style.overflow = 'hidden';
-      imgContainer.style.marginBottom = '0.3rem';
+      imgContainer.style.marginBottom = '0.2rem';
       imgContainer.style.backgroundColor = getRandomColor(celebrity); // Fallback background color
       imgContainer.style.display = 'flex';
       imgContainer.style.justifyContent = 'center';

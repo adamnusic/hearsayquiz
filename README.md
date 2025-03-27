@@ -1,4 +1,4 @@
-# Voice Jump - Hear Say!? Game
+# Hear Say!? Quiz
 
 A game where players guess which celebrity said a quote.
 

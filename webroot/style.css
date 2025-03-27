@@ -231,24 +231,6 @@ h3 {
   position: relative;
 }
 
-#quote-text::before, #quote-text::after {
-  content: '"';
-  font-size: 2rem;
-  color: var(--primary-color);
-  position: absolute;
-  opacity: 0.6;
-}
-
-#quote-text::before {
-  top: -10px;
-  left: -10px;
-}
-
-#quote-text::after {
-  bottom: -20px;
-  right: -10px;
-}
-
 /* Celebrity buttons */
 #celebrities-container {
   display: grid;
