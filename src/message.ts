@@ -13,7 +13,8 @@ export type WebViewMessage =
   | { type: 'microphoneData'; data: { volume: number; error?: string } }
   | { type: 'categorySelected'; data: { category: string } }
   | { type: 'quoteAnswered'; data: { correct: boolean; score: number } }
-  | { type: 'playAgain' };
+  | { type: 'playAgain' }
+  | { type: 'readyForGameData' };
 
 /**
  * Web view MessageEvent listener data type. The Devvit API wraps all messages

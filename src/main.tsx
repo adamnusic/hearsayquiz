@@ -1,6 +1,6 @@
 import './createPost.js';
 
-import { Devvit, useState, useWebView, useEffect } from '@devvit/public-api';
+import { Devvit, useState, useWebView } from '@devvit/public-api';
 
 import type { DevvitMessage, WebViewMessage, QuoteData } from './message.js';
 
@@ -121,23 +121,7 @@ Devvit.addCustomPostType({
     // Load username and score with useState
     const [username, setUsername] = useState<string>('Loading...');
     const [score, setScore] = useState<number>(0);
-
-    // Load initial data when webview is ready
-    const loadInitialData = async () => {
-      try {
-        // Get username
-        const currentUsername = await context.reddit.getCurrentUsername() ?? 'anon';
-        setUsername(currentUsername);
-        console.log('Loaded username:', currentUsername);
-
-        // Get score from Redis
-        const redisScore = await context.redis.get(`hearsay_score_${currentUsername}`);
-        console.log('Loaded score from Redis:', redisScore);
-        setScore(Number(redisScore ?? 0));
-      } catch (error) {
-        console.error('Error loading initial data:', error);
-      }
-    };
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     // Track the selected category
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -167,74 +151,158 @@ Devvit.addCustomPostType({
       };
     };
 
+    // Load username with proper error handling and caching
+    const loadUsername = async () => {
+      try {
+        console.log('Attempting to get username with caching...');
+        const username = await context.cache(
+          async () => {
+            const result = await context.reddit.getCurrentUsername();
+            console.log('Raw username from reddit.getCurrentUsername:', result);
+            return result ?? 'anon';
+          },
+          {
+            key: 'current_username',
+            ttl: 60 * 60 * 1000, // 1 hour cache
+          }
+        );
+        console.log('Cached username result:', username);
+        return username;
+      } catch (error) {
+        console.log('Error getting username, using fallback:', error);
+        return 'anon';
+      }
+    };
+
+    // Load score from Redis with proper error handling
+    const loadScore = async (username: string) => {
+      try {
+        console.log('Fetching score for username:', username);
+        const redisKey = `hearsay:score:${username}`;
+        const redisScore = await context.redis.get(redisKey);
+        console.log('Redis score result:', redisScore);
+        return redisScore ? parseInt(redisScore, 10) : 0;
+      } catch (error) {
+        console.log('Error accessing Redis, using default score:', error);
+        return 0;
+      }
+    };
+
+    // Initialize game state with proper sequencing
+    const initializeGameState = async () => {
+      try {
+        console.log('Starting game state initialization...');
+        
+        // First, get the username
+        const currentUsername = await loadUsername();
+        console.log('Setting username to:', currentUsername);
+        setUsername(currentUsername);
+        
+        // Then, get the score
+        const currentScore = await loadScore(currentUsername);
+        console.log('Setting score to:', currentScore);
+        setScore(currentScore);
+        
+        // Finally, update loading state
+        setIsLoading(false);
+        
+        return {
+          username: currentUsername,
+          score: currentScore
+        };
+      } catch (error) {
+        console.error('Error initializing game state:', error);
+        setUsername('anon');
+        setScore(0);
+        setIsLoading(false);
+        return {
+          username: 'anon',
+          score: 0
+        };
+      }
+    };
+
     const webView = useWebView<WebViewMessage, DevvitMessage>({
-      // URL of your web view content
       url: 'page.html',
 
-      // Handle messages sent from the web view
       async onMessage(message, webView) {
         console.log('Received message from webview:', message);
         
         switch (message.type) {
           case 'webViewReady':
-            console.log('Web view is ready, loading initial data');
-            await loadInitialData();
+            console.log('Web view is ready, initializing game state');
+            const gameState = await initializeGameState();
             
+            // Send initial data to webview immediately
+            console.log('Sending initial data to webview:', gameState);
             webView.postMessage({
               type: 'initialData',
               data: {
-                username: username,
+                username: gameState.username,
+                currentCounter: gameState.score,
+              },
+            });
+            break;
+            
+          case 'readyForGameData':
+            console.log('Webview ready for game data, sending current state');
+            // Send current state immediately
+            webView.postMessage({
+              type: 'initialData',
+              data: {
+                username,
                 currentCounter: score,
               },
             });
-            
+            // If we have a selected category, send game data
             if (selectedCategory) {
-              console.log('Selected category exists, sending game data for:', selectedCategory);
-              // If category is already selected, send game data immediately
               const gameData = getGameData(selectedCategory);
-              
               webView.postMessage({
                 type: 'gameData',
                 data: gameData,
               });
             }
             break;
-          case 'categorySelected':
-            // This is now handled directly in the main view, but kept for backward compatibility
-            setSelectedCategory(message.data.category);
-            // Get game data with proper asset URLs
-            const gameData = getGameData(message.data.category);
             
+          case 'categorySelected':
+            setSelectedCategory(message.data.category);
+            const gameData = getGameData(message.data.category);
+            // Send current state with game data
+            webView.postMessage({
+              type: 'initialData',
+              data: {
+                username,
+                currentCounter: score,
+              },
+            });
             webView.postMessage({
               type: 'gameData',
               data: gameData,
             });
             break;
+            
           case 'quoteAnswered':
             if (message.data.correct) {
-              // If correct, update the score
-              const newScore = score + message.data.score;
-              console.log('Updating score in Redis:', {
-                username,
-                oldScore: score,
-                newScore,
-                key: `hearsay_score_${username}`
-              });
-              await context.redis.set(`hearsay_score_${username}`, newScore.toString());
-              setScore(newScore);
+              console.log('Correct answer, updating score:', message.data.score);
+              await handleScore(score + message.data.score);
             }
             break;
+            
           case 'playAgain':
-            // User wants to play again, set selected category to null
-            // The webview will automatically close when user clicks outside of it
             setSelectedCategory(null);
+            // Send current state when playing again
+            webView.postMessage({
+              type: 'initialData',
+              data: {
+                username,
+                currentCounter: score,
+              },
+            });
             break;
+            
           default:
-            // Handle other message types
             if ((message as any).type === 'setCounter') {
-              const newCounter = (message as any).data.newCounter;
-              await context.redis.set(`hearsay_score_${username}`, newCounter.toString());
-              setScore(newCounter);
+              await handleScore((message as any).data.newCounter);
             }
         }
       },
@@ -243,31 +311,66 @@ Devvit.addCustomPostType({
       },
     });
 
+    // Single function to handle all score operations
+    const handleScore = async (newScore: number) => {
+      try {
+        console.log('Updating score:', {
+          username,
+          oldScore: score,
+          newScore,
+        });
+        
+        try {
+          // Update Redis using regular key
+          const redisKey = `hearsay:score:${username}`;
+          await context.redis.set(redisKey, newScore.toString());
+          console.log('Score updated in Redis:', redisKey, newScore);
+        } catch (error) {
+          console.log('Error updating Redis, continuing with local state:', error);
+        }
+        
+        // Update local state regardless of Redis success
+        setScore(newScore);
+        
+        // Send updated score to webview
+        webView.postMessage({
+          type: 'initialData',
+          data: {
+            username,
+            currentCounter: newScore,
+          },
+        });
+      } catch (error) {
+        console.error('Error updating score:', error);
+        // Still update local state even if Redis fails
+        setScore(newScore);
+      }
+    };
+
     // Update the category button press handler
-    const handleCategoryPress = (category: string) => {
+    const handleCategoryPress = async (category: string) => {
       console.log('Category button pressed:', category);
-      
       setSelectedCategory(category);
-      
-      // Mount the webview first
-      console.log('Mounting webview');
       webView.mount();
       
-      // Get game data with proper asset URLs
-      console.log('Preparing game data for category:', category);
+      // Ensure we have the latest game state
+      const gameState = await initializeGameState();
+      
       const gameData = getGameData(category);
       console.log('Game data prepared, quoteId:', gameData.quoteData.id);
       
-      // Give it a moment to mount, then send the data
-      console.log('Setting timeout to send game data');
-      setTimeout(() => {
-        console.log('Timeout fired, sending gameData for category:', category);
-        webView.postMessage({
-          type: 'gameData',
-          data: gameData,
-        });
-        console.log('gameData message sent');
-      }, 1000); // Increased timeout to ensure webview is fully mounted
+      // Send game data and initial data to webview
+      webView.postMessage({
+        type: 'initialData',
+        data: {
+          username: gameState.username,
+          currentCounter: gameState.score,
+        },
+      });
+      webView.postMessage({
+        type: 'gameData',
+        data: gameData,
+      });
     };
 
     // Display the UI
@@ -296,11 +399,11 @@ Devvit.addCustomPostType({
           <hstack gap="small">
             <text size="xlarge" color="white">Player: </text>
             <text size="xlarge" weight="bold" color="#F5F834">
-              {username ?? ''}
+              {isLoading ? 'Loading...' : username}
             </text>
             <text size="xlarge" color="white"> | Score: </text>
             <text size="xlarge" weight="bold" color="#F5F834">
-              {score ?? '0'}
+              {isLoading ? '0' : score}
             </text>
           </hstack>
           

@@ -61,15 +61,19 @@ function setupMessageListener() {
   const messageListener = (event) => {
     console.log('Received event:', event);
     
-    // Ensure the message is from Devvit
-    if (event.data?.type !== 'devvit-message') {
+    // Check if the message is from Devvit
+    if (event.data?.type === 'devvit-message') {
+      console.log('Processing devvit message:', event.data.message);
+      handleDevvitMessage(event.data.message);
+    } else if (event.data?.type === 'initialData') {
+      console.log('Processing initialData message directly:', event.data);
+      handleDevvitMessage({
+        type: 'initialData',
+        data: event.data.data
+      });
+    } else {
       console.log('Not a devvit message, ignoring');
-      return;
     }
-
-    const message = event.data.message;
-    console.log('Processing devvit message:', message);
-    handleDevvitMessage(message);
   };
 
   // Add the message listener
@@ -93,67 +97,61 @@ function setupMessageListener() {
 // Send a message to the blocks view
 function sendMessage(message) {
   console.log('Sending message to Devvit:', message);
+  window.logDiagnostic(`⬆️ ${message.type}`);
+  
   try {
-    if (!window.parent) {
-      console.error('Cannot access window.parent');
-      window.logDiagnostic('ERROR: Cannot access window.parent');
-      return false;
-    }
-    
-    window.parent.postMessage({ message }, '*');
+    window.parent.postMessage({
+      type: 'devvit-message',
+      message: message
+    }, '*');
     console.log('Message sent successfully');
     window.logDiagnostic(`Message sent: ${message.type}`);
-    return true;
-  } catch (err) {
-    console.error('Error sending message:', err);
-    window.logDiagnostic(`ERROR sending message: ${err.message}`);
-    
-    // Schedule a retry
-    setTimeout(() => {
-      console.log('Retrying message send:', message);
-      window.logDiagnostic(`Retrying message: ${message.type}`);
-      try {
-        window.parent.postMessage({ message }, '*');
-        console.log('Retry message sent successfully');
-        window.logDiagnostic(`Retry message sent: ${message.type}`);
-      } catch (retryErr) {
-        console.error('Retry also failed:', retryErr);
-        window.logDiagnostic(`Retry also failed: ${retryErr.message}`);
-      }
-    }, 1000);
-    
-    return false;
+  } catch (error) {
+    console.error('Error sending message:', error);
+    window.logDiagnostic(`Error sending message: ${error.message}`);
   }
 }
 
 // Handle messages from the blocks view
 function handleDevvitMessage(message) {
-  console.log('Received message from Devvit:', message);
+  console.log('Processing Devvit message:', message);
   window.logDiagnostic(`⬇️ ${message.type}`);
   
   switch (message.type) {
     case 'initialData':
+      console.log('Processing initialData message:', message.data);
+      window.logDiagnostic(`Processing initialData: username=${message.data.username}, score=${message.data.currentCounter}`);
+      
+      // Update game state
       gameState.username = message.data.username;
       gameState.score = message.data.currentCounter;
       
-      // Check if there's leaderboard data
-      if (message.data.leaderboard) {
-        gameState.leaderboard = message.data.leaderboard;
-        updateLeaderboard();
+      // Update UI elements
+      const usernameEl = document.getElementById('username');
+      const scoreEl = document.getElementById('score');
+      
+      console.log('Found username element:', !!usernameEl);
+      console.log('Found score element:', !!scoreEl);
+      
+      if (usernameEl) {
+        usernameEl.textContent = gameState.username;
+        console.log('Updated username element to:', gameState.username);
+      } else {
+        console.error('Could not find username element');
       }
       
-      // Update UI with the initial data
-      usernameElement.textContent = gameState.username;
-      scoreElement.textContent = gameState.score;
-      console.log('Updated initial data:', gameState.username, gameState.score);
+      if (scoreEl) {
+        scoreEl.textContent = gameState.score;
+        console.log('Updated score element to:', gameState.score);
+      } else {
+        console.error('Could not find score element');
+      }
+      
       window.logDiagnostic(`Updated player: ${gameState.username}, score: ${gameState.score}`);
       
       // Store the data but don't request game data yet - wait for START GAME button
       window.gameDataRequested = false;
       window.logDiagnostic('Waiting for user to click START GAME button');
-      
-      // DO NOT auto-load test data, even if explicitly requested
-      // Just keep the loading screen visible with the START GAME button
       break;
       
     case 'gameData':
