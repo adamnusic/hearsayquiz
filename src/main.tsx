@@ -205,11 +205,8 @@ interface GameResponse {
 function getGameData(category: string): GameResponse {
   // Find the quote data for the selected category
   const quoteData = MOCK_QUOTES.find(quote => {
-    // Extract the category from the ID (e.g., 'music1' -> 'music')
-    const quoteCategory = quote.id.split('1')[0].toLowerCase();
-    const inputCategory = category.toLowerCase();
-    console.log('Comparing categories:', { quoteCategory, inputCategory });
-    return quoteCategory === inputCategory;
+    // Direct category match without any string manipulation
+    return quote.id.toLowerCase() === category.toLowerCase();
   });
   
   if (!quoteData) {

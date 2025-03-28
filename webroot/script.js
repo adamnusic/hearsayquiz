@@ -2265,6 +2265,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Category-specific quiz data
 const CATEGORY_DATA = {
+  movies: {
+    id: 'movies',
+    quote: "It does not do to dwell on dreams and forget to live.",
+    correctCelebrity: "Harry Potter",
+    celebrities: [
+      "Alex DeLarge",
+      "Darth Vader",
+      "Don Corleone",
+      "Harry Potter",
+      "Jules Winnfield",
+      "Robocop"
+    ],
+    audioClips: {
+      "Alex DeLarge": "audio/movies/alex-delarge_movies.wav",
+      "Darth Vader": "audio/movies/darth-vader_movies.wav",
+      "Don Corleone": "audio/movies/don-corleone_movies.wav",
+      "Harry Potter": "audio/movies/harry-potter_movies.wav",
+      "Jules Winnfield": "audio/movies/jules-winnfield_movies.wav",
+      "Robocop": "audio/movies/robocop_movies.wav"
+    },
+    images: {
+      "Alex DeLarge": "images/movies/alex-delarge_movies.jpg",
+      "Darth Vader": "images/movies/darth-vader_movies.jpg",
+      "Don Corleone": "images/movies/don-corleone_movies.jpg",
+      "Harry Potter": "images/movies/harry-potter_movies.jpg",
+      "Jules Winnfield": "images/movies/jules-winnfield_movies.jpg",
+      "Robocop": "images/movies/robocop_movies.jpg"
+    }
+  },
   music: {
     id: 'music1',
     quote: "A lot of people don't appreciate the moment until it's passed.",
@@ -2277,20 +2306,6 @@ const CATEGORY_DATA = {
       "Rick Rubin": "audio/music/rick-rubin_music.wav",
       "Snoop Dogg": "audio/music/snoop-dogg_music.wav",
       "Ye": "audio/music/ye_music.wav"
-    }
-  },
-  movies: {
-    id: 'movies1',
-    quote: "It does not do to dwell on dreams and forget to live.",
-    correctCelebrity: "Harry Potter",
-    celebrities: ["Alex DeLarge", "Darth Vader", "Don Corleone", "Harry Potter", "Jules Winnfield", "Robocop"],
-    audioClips: {
-      "Alex DeLarge": "audio/movies/alex-delarge_movies.wav",
-      "Darth Vader": "audio/movies/darth-vader_movies.wav",
-      "Don Corleone": "audio/movies/don-corleone_movies.wav",
-      "Harry Potter": "audio/movies/harry-potter_movies.wav",
-      "Jules Winnfield": "audio/movies/jules-winnfield_movies.wav",
-      "Robocop": "audio/movies/robocop_movies.wav"
     }
   },
   sports: {
@@ -2562,6 +2577,49 @@ window.testReceiveGameData = function() {
     audioClips: audioFiles,
     imageFiles: imageFiles
   };
+
+    // Create a test category
+  //  const category = "Movies";
+  
+    // Create celebrity buttons with real audio paths
+    //const celebrities = [
+    //  "Alex DeLarge",
+    //  "Darth Vader",
+    //  "Don Corleone",
+    //  "Harry Potter",
+    //  "Jules Winnfield",
+    //  "Robocop"
+    //];
+    
+    // Map of celebrities to their audio files
+    //const audioFiles = {
+    //  "Alex DeLarge": "assets/audio/movies/alex-delarge_movies.wav",
+    //  "Darth Vader": "assets/audio/movies/darth-vader_movies.wav",
+    //  "Don Corleone": "assets/audio/movies/don-corleone_movies.wav",
+    //  "Harry Potter": "assets/audio/movies/harry-potter_movies.wav",
+    //  "Jules Winnfield": "assets/audio/movies/jules-winnfield_movies.wav",
+    //  "Robocop": "assets/audio/movies/robocop_movies.wav"
+    //};
+  
+    // Map of celebrities to their image files
+    //const imageFiles = {
+    //  "Alex DeLarge": "assets/images/movies/alex-delarge_movies.jpg",
+    //  "Darth Vader": "assets/images/movies/darth-vader_movies.jpg",
+    //  "Don Corleone": "assets/images/movies/don-corleone_movies.jpg",
+    //  "Harry Potter": "assets/images/movies/harry-potter_movies.jpg",
+    //  "Jules Winnfield": "assets/images/movies/jules-winnfield_movies.jpg",
+    //  "Robocop": "assets/images/movies/robocop_movies.jpg"
+    //};
+    
+    // Create and store the quote data
+    //const quoteData = {
+    //  id: 'movies1',
+    //  quote: "It does not do to dwell on dreams and forget to live."",
+    //  correctCelebrity: "Harry Potter",
+    //  celebrities: celebrities,
+    //  audioClips: audioFiles,
+    //  imageFiles: imageFiles
+    //};
   
   try {
     window.logDiagnostic("Step 1: Removing loading indicator");
@@ -4727,3 +4785,105 @@ function handleStartButtonClick() {
     }
   }, 1000);
 }
+
+// Hardcoded category data
+const CATEGORY_DATA = {
+  movies: {
+    id: 'movies',
+    quote: "It does not do to dwell on dreams and forget to live.",
+    correctCelebrity: "Harry Potter",
+    celebrities: [
+      "Alex DeLarge",
+      "Darth Vader",
+      "Don Corleone",
+      "Harry Potter",
+      "Jules Winnfield",
+      "Robocop"
+    ],
+    audioClips: {
+      "Alex DeLarge": "audio/movies/alex-delarge_movies.wav",
+      "Darth Vader": "audio/movies/darth-vader_movies.wav",
+      "Don Corleone": "audio/movies/don-corleone_movies.wav",
+      "Harry Potter": "audio/movies/harry-potter_movies.wav",
+      "Jules Winnfield": "audio/movies/jules-winnfield_movies.wav",
+      "Robocop": "audio/movies/robocop_movies.wav"
+    },
+    images: {
+      "Alex DeLarge": "images/movies/alex-delarge_movies.jpg",
+      "Darth Vader": "images/movies/darth-vader_movies.jpg",
+      "Don Corleone": "images/movies/don-corleone_movies.jpg",
+      "Harry Potter": "images/movies/harry-potter_movies.jpg",
+      "Jules Winnfield": "images/movies/jules-winnfield_movies.jpg",
+      "Robocop": "images/movies/robocop_movies.jpg"
+    }
+  }
+};
+
+// Update the category button click handler
+function handleCategoryButtonClick(category) {
+  console.log('Category button clicked:', category);
+  window.logDiagnostic(`Category button clicked: ${category}`);
+  
+  // Get the quote data for the selected category
+  const quoteData = CATEGORY_DATA[category.toLowerCase()];
+  if (!quoteData) {
+    console.error('Invalid category:', category);
+    window.logDiagnostic(`ERROR: Invalid category: ${category}`);
+    return;
+  }
+  
+  // Store the game data
+  gameState.currentCategory = category;
+  gameState.currentQuote = quoteData;
+  gameState.lastPlayedCategory = category;
+  
+  // Add category to played categories if not already there
+  if (!gameState.playedCategories.includes(category)) {
+    gameState.playedCategories.push(category);
+  }
+  
+  // Update quote text
+  if (window.quoteTextElement) {
+    window.quoteTextElement.textContent = `"${quoteData.quote}"`;
+  }
+  
+  // Update category
+  if (window.currentCategoryElement) {
+    window.currentCategoryElement.textContent = category;
+  }
+  
+  // Start the game with the quote data
+  startGame(category, quoteData);
+}
+
+// Create category buttons
+function createCategoryButtons() {
+  const categories = ['Movies', 'Music', 'Politics', 'History', 'Sports', 'Academia'];
+  const container = document.getElementById('category-buttons');
+  
+  if (!container) {
+    console.error('Category buttons container not found');
+    return;
+  }
+  
+  container.innerHTML = '';
+  
+  categories.forEach(category => {
+    const button = document.createElement('button');
+    button.className = 'category-button';
+    button.textContent = category;
+    button.onclick = () => handleCategoryButtonClick(category);
+    container.appendChild(button);
+  });
+}
+
+// Add event listeners for category buttons
+document.addEventListener('DOMContentLoaded', function() {
+  const categoryButtons = document.querySelectorAll('.category-button');
+  categoryButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const category = this.getAttribute('data-category');
+      handleCategoryButtonClick(category);
+    });
+  });
+});
