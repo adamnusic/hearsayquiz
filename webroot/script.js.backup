@@ -2339,7 +2339,7 @@ const CATEGORY_DATA = {
     }
   },
   music: {
-    id: 'music',
+    id: 'music1',
     quote: "A lot of people don't appreciate the moment until it's passed.",
     correctCelebrity: "Ye",
     celebrities: ["Drake", "John Lennon", "Psy", "Rick Rubin", "Snoop Dogg", "Ye"],
@@ -2350,40 +2350,10 @@ const CATEGORY_DATA = {
       "Rick Rubin": "audio/music/rick-rubin_music.wav",
       "Snoop Dogg": "audio/music/snoop-dogg_music.wav",
       "Ye": "audio/music/ye_music.wav"
-    },
-    images: {
-      "Drake": "images/music/drake_music.jpg",
-      "John Lennon": "images/music/john-lennon_music.jpg",
-      "Psy": "images/music/psy_music.jpg",
-      "Rick Rubin": "images/music/rick-rubin_music.jpg",
-      "Snoop Dogg": "images/music/snoop-dogg_music.jpg",
-      "Ye": "images/music/ye_music.jpg"
-    }
-  },
-  politics: {
-    id: 'politics',
-    quote: "The only thing we have to fear is fear itself.",
-    correctCelebrity: "Franklin D. Roosevelt",
-    celebrities: ["Barack Obama", "Franklin D. Roosevelt", "John F. Kennedy", "Martin Luther King Jr.", "Nelson Mandela", "Winston Churchill"],
-    audioClips: {
-      "Barack Obama": "audio/politics/barack-obama_politics.wav",
-      "Franklin D. Roosevelt": "audio/politics/fdr_politics.wav",
-      "John F. Kennedy": "audio/politics/jfk_politics.wav",
-      "Martin Luther King Jr.": "audio/politics/mlk_politics.wav",
-      "Nelson Mandela": "audio/politics/nelson-mandela_politics.wav",
-      "Winston Churchill": "audio/politics/winston-churchill_politics.wav"
-    },
-    images: {
-      "Barack Obama": "images/politics/barack-obama_politics.jpg",
-      "Franklin D. Roosevelt": "images/politics/fdr_politics.jpg",
-      "John F. Kennedy": "images/politics/jfk_politics.jpg",
-      "Martin Luther King Jr.": "images/politics/mlk_politics.jpg",
-      "Nelson Mandela": "images/politics/nelson-mandela_politics.jpg",
-      "Winston Churchill": "images/politics/winston-churchill_politics.jpg"
     }
   },
   sports: {
-    id: 'sports',
+    id: 'sports1',
     quote: "I've failed over and over and over again in my life and that is why I succeed.",
     correctCelebrity: "Michael Jordan",
     celebrities: ["Kobe Bryant", "LeBron James", "Michael Jordan", "Muhammad Ali", "Serena Williams", "Tom Brady"],
@@ -2394,58 +2364,20 @@ const CATEGORY_DATA = {
       "Muhammad Ali": "audio/sports/muhammad-ali_sports.wav",
       "Serena Williams": "audio/sports/serena-williams_sports.wav",
       "Tom Brady": "audio/sports/tom-brady_sports.wav"
-    },
-    images: {
-      "Kobe Bryant": "images/sports/kobe-bryant_sports.jpg",
-      "LeBron James": "images/sports/lebron-james_sports.jpg",
-      "Michael Jordan": "images/sports/michael-jordan_sports.jpg",
-      "Muhammad Ali": "images/sports/muhammad-ali_sports.jpg",
-      "Serena Williams": "images/sports/serena-williams_sports.jpg",
-      "Tom Brady": "images/sports/tom-brady_sports.jpg"
     }
   },
-  history: {
-    id: 'history',
-    quote: "Do not compare yourself to others, if you do so you are insulting yourself.",
-    correctCelebrity: "Adolf Hitler",
-    celebrities: ["Adolf Hitler", "Jesus Christ", "Julius Ceasar", "Napoleon Bonaparte", "Neil Armstrong", "Sam Bankman Fried"],
+  politics: {
+    id: 'politics1',
+    quote: "The only thing we have to fear is fear itself.",
+    correctCelebrity: "Franklin D. Roosevelt",
+    celebrities: ["Barack Obama", "Franklin D. Roosevelt", "John F. Kennedy", "Martin Luther King Jr.", "Nelson Mandela", "Winston Churchill"],
     audioClips: {
-      "Adolf Hitler": "audio/history/adolf-hitler_history.wav",
-      "Jesus Christ": "audio/history/jesus-christ_history.wav",
-      "Julius Ceasar": "audio/history/julius-ceasar_history.wav",
-      "Napoleon Bonaparte": "audio/history/napoleon-bonaparte_history.wav",
-      "Neil Armstrong": "audio/history/neil-armstrong_history.wav",
-      "Sam Bankman Fried": "audio/history/sam-bankman-fried_history.wav"
-    },
-    images: {
-      "Adolf Hitler": "images/history/adolf-hitler_history.jpg",
-      "Jesus Christ": "images/history/jesus-christ_history.jpg",
-      "Julius Ceasar": "images/history/julius-ceasar_history.jpg",
-      "Napoleon Bonaparte": "images/history/napoleon-bonaparte_history.jpg",
-      "Neil Armstrong": "images/history/neil-armstrong_history.jpg",
-      "Sam Bankman Fried": "images/history/sam-bankman-fried_history.jpg"
-    }
-  },
-  academia: {
-    id: 'academia',
-    quote: "A scientist in his laboratory is not only a technician, he is also a child.",
-    correctCelebrity: "Marie Curie",
-    celebrities: ["Albert Einstein", "Da Vinci", "He Jiankui", "Jensen Huang", "Marie Curie", "Oppenheimer"],
-    audioClips: {
-      "Albert Einstein": "audio/academia/albert-einstein_academia.wav",
-      "Da Vinci": "audio/academia/da-vinci_academia.wav",
-      "He Jiankui": "audio/academia/he-jiankui_academia.wav",
-      "Jensen Huang": "audio/academia/jensen-huang_academia.wav",
-      "Marie Curie": "audio/academia/marie-curie_academia.wav",
-      "Oppenheimer": "audio/academia/oppenheimer_academia.wav"
-    },
-    images: {
-      "Albert Einstein": "images/academia/albert-einstein_academia.jpg",
-      "Da Vinci": "images/academia/da-vinci_academia.jpg",
-      "He Jiankui": "images/academia/he-jiankui_academia.jpg",
-      "Jensen Huang": "images/academia/jensen-huang_academia.jpg",
-      "Marie Curie": "images/academia/marie-curie_academia.jpg",
-      "Oppenheimer": "images/academia/oppenheimer_academia.jpg"
+      "Barack Obama": "audio/politics/barack-obama_politics.wav",
+      "Franklin D. Roosevelt": "audio/politics/fdr_politics.wav",
+      "John F. Kennedy": "audio/politics/jfk_politics.wav",
+      "Martin Luther King Jr.": "audio/politics/mlk_politics.wav",
+      "Nelson Mandela": "audio/politics/nelson-mandela_politics.wav",
+      "Winston Churchill": "audio/politics/winston-churchill_politics.wav"
     }
   }
 };
@@ -2689,6 +2621,49 @@ window.testReceiveGameData = function() {
     audioClips: audioFiles,
     imageFiles: imageFiles
   };
+
+    // Create a test category
+  //  const category = "Movies";
+  
+    // Create celebrity buttons with real audio paths
+    //const celebrities = [
+    //  "Alex DeLarge",
+    //  "Darth Vader",
+    //  "Don Corleone",
+    //  "Harry Potter",
+    //  "Jules Winnfield",
+    //  "Robocop"
+    //];
+    
+    // Map of celebrities to their audio files
+    //const audioFiles = {
+    //  "Alex DeLarge": "assets/audio/movies/alex-delarge_movies.wav",
+    //  "Darth Vader": "assets/audio/movies/darth-vader_movies.wav",
+    //  "Don Corleone": "assets/audio/movies/don-corleone_movies.wav",
+    //  "Harry Potter": "assets/audio/movies/harry-potter_movies.wav",
+    //  "Jules Winnfield": "assets/audio/movies/jules-winnfield_movies.wav",
+    //  "Robocop": "assets/audio/movies/robocop_movies.wav"
+    //};
+  
+    // Map of celebrities to their image files
+    //const imageFiles = {
+    //  "Alex DeLarge": "assets/images/movies/alex-delarge_movies.jpg",
+    //  "Darth Vader": "assets/images/movies/darth-vader_movies.jpg",
+    //  "Don Corleone": "assets/images/movies/don-corleone_movies.jpg",
+    //  "Harry Potter": "assets/images/movies/harry-potter_movies.jpg",
+    //  "Jules Winnfield": "assets/images/movies/jules-winnfield_movies.jpg",
+    //  "Robocop": "assets/images/movies/robocop_movies.jpg"
+    //};
+    
+    // Create and store the quote data
+    //const quoteData = {
+    //  id: 'movies1',
+    //  quote: "It does not do to dwell on dreams and forget to live."",
+    //  correctCelebrity: "Harry Potter",
+    //  celebrities: celebrities,
+    //  audioClips: audioFiles,
+    //  imageFiles: imageFiles
+    //};
   
   try {
     window.logDiagnostic("Step 1: Removing loading indicator");
@@ -4856,11 +4831,6 @@ function handleStartButtonClick() {
 }
 
 // Hardcoded category data
-function handleCategoryButtonClick(category) {
-  console.log('Category button clicked:', category);
-  window.logDiagnostic(`Category button clicked: ${category}`);
-  
-  // Get the quote data for the selected category
   const quoteData = CATEGORY_DATA[category.toLowerCase()];
   if (!quoteData) {
     console.error('Invalid category:', category);
@@ -4891,37 +4861,3 @@ function handleCategoryButtonClick(category) {
   // Start the game with the quote data
   startGame(category, quoteData);
 }
-
-// Add event listeners for category buttons
-document.addEventListener('DOMContentLoaded', function() {
-  const categoryButtons = document.querySelectorAll('.category-button');
-  categoryButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const category = this.getAttribute('data-category');
-      handleCategoryButtonClick(category);
-    });
-  });
-});
-
-// Utility debugging function that can be turned on when needed
-window.debug = function(message) {
-  console.log(`[DEBUG] ${message}`);
-  const debugOutput = document.getElementById('debug-output');
-  if (debugOutput) {
-    // Show the debug panel
-    debugOutput.style.display = 'block';
-    
-    // Add the message
-    const msgElement = document.createElement('div');
-    msgElement.textContent = message;
-    debugOutput.appendChild(msgElement);
-    
-    // Limit to last 10 messages
-    while (debugOutput.childElementCount > 10) {
-      debugOutput.removeChild(debugOutput.firstChild);
-    }
-    
-    // Auto-scroll to bottom
-    debugOutput.scrollTop = debugOutput.scrollHeight;
-  }
-};

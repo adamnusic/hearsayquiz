@@ -8,6 +8,7 @@
     <meta charset="UTF-8" />
     <title>Hear Say!? - Who Said That?</title>
     <link rel="stylesheet" href="style.css" />
+    <link rel="preload" href="assets/hearsay-bg.png" as="image" />
     <style>
       /* Background wrapper that will work in Devvit blocks */
       #background-wrapper {
@@ -18,7 +19,7 @@
         height: 100%;
         z-index: -1;
         background-color: #121212;
-        background-image: url('../assets/hearsay-bg.png');
+        background-image: url('assets/hearsay-bg.png');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -159,6 +160,8 @@
       <audio id="correct-audio" src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==" preload="auto"></audio>
       <audio id="incorrect-audio" src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==" preload="auto"></audio>
     </div>
+    
+    <div id="debug-output" style="position: fixed; bottom: 10px; right: 10px; background-color: rgba(0,0,0,0.7); color: white; padding: 10px; border-radius: 5px; max-width: 300px; max-height: 150px; overflow: auto; font-size: 12px; display: none;"></div>
     
     <script type="application/javascript" src="script.js"></script>
   </body>
