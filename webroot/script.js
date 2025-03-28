@@ -136,18 +136,20 @@ function handleDevvitMessage(message) {
       if (usernameEl) {
         usernameEl.textContent = gameState.username;
         console.log('Updated username element to:', gameState.username);
+        window.logDiagnostic(`Updated username to: ${gameState.username}`);
       } else {
         console.error('Could not find username element');
+        window.logDiagnostic('ERROR: Could not find username element');
       }
       
       if (scoreEl) {
         scoreEl.textContent = gameState.score;
         console.log('Updated score element to:', gameState.score);
+        window.logDiagnostic(`Updated score to: ${gameState.score}`);
       } else {
         console.error('Could not find score element');
+        window.logDiagnostic('ERROR: Could not find score element');
       }
-      
-      window.logDiagnostic(`Updated player: ${gameState.username}, score: ${gameState.score}`);
       
       // Store the data but don't request game data yet - wait for START GAME button
       window.gameDataRequested = false;
