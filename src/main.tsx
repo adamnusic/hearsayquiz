@@ -14,104 +14,215 @@ Devvit.configure({
 const CATEGORIES = ['Music', 'Politics', 'Movies', 'History', 'Sports', 'Academia'];
 
 // Mock quote data for demonstration
-const MOCK_QUOTES: Record<string, QuoteData[]> = {
-  Music: [
-    {
-      id: 'music1',
-      quote: "A lot of people don't appreciate the moment until it's passed.",
-      correctCelebrity: "Ye",
-      celebrities: ["Drake", "John Lennon", "Psy", "Rick Rubin", "Snoop Dogg", "Ye"],
-      audioClips: {
-        "Drake": "audio/music/drake_music.wav",
-        "John Lennon": "audio/music/john-lennon_music.wav",
-        "Psy": "audio/music/psy_music.wav",
-        "Rick Rubin": "audio/music/rick-rubin_music.wav",
-        "Snoop Dogg": "audio/music/snoop-dogg_music.wav",
-        "Ye": "audio/music/ye_music.wav"
-      }
+const MOCK_QUOTES = [
+  {
+    id: 'movies',
+    quote: "It does not do to dwell on dreams and forget to live.",
+    correctCelebrity: "Harry Potter",
+    celebrities: [
+      "Alex DeLarge",
+      "Darth Vader",
+      "Don Corleone",
+      "Harry Potter",
+      "Jules Winnfield",
+      "Robocop"
+    ],
+    audioClips: {
+      "Alex DeLarge": "audio/movies/alex-delarge_movies.wav",
+      "Darth Vader": "audio/movies/darth-vader_movies.wav",
+      "Don Corleone": "audio/movies/don-corleone_movies.wav",
+      "Harry Potter": "audio/movies/harry-potter_movies.wav",
+      "Jules Winnfield": "audio/movies/jules-winnfield_movies.wav",
+      "Robocop": "audio/movies/robocop_movies.wav"
+    },
+    images: {
+      "Alex DeLarge": "images/movies/alex-delarge_movies.jpg",
+      "Darth Vader": "images/movies/darth-vader_movies.jpg",
+      "Don Corleone": "images/movies/don-corleone_movies.jpg",
+      "Harry Potter": "images/movies/harry-potter_movies.jpg",
+      "Jules Winnfield": "images/movies/jules-winnfield_movies.jpg",
+      "Robocop": "images/movies/robocop_movies.jpg"
     }
-  ],
-  Movies: [
-    {
-      id: 'movies1',
-      quote: "May the Force be with you.",
-      correctCelebrity: "Harrison Ford",
-      celebrities: ["Harrison Ford", "Mark Hamill", "Carrie Fisher", "James Earl Jones", "Samuel L. Jackson", "Daisy Ridley"],
-      audioClips: {
-        "Harrison Ford": "audio/movies/ford_force.mp3",
-        "Mark Hamill": "audio/movies/hamill_force.mp3",
-        "Carrie Fisher": "audio/movies/fisher_force.mp3",
-        "James Earl Jones": "audio/movies/jones_force.mp3",
-        "Samuel L. Jackson": "audio/movies/jackson_force.mp3",
-        "Daisy Ridley": "audio/movies/ridley_force.mp3"
-      }
+  },
+  {
+    id: 'music',
+    quote: "A lot of people don't appreciate the moment until it's passed.",
+    correctCelebrity: "Ye",
+    celebrities: [
+      "Drake",
+      "John Lennon",
+      "Psy",
+      "Rick Rubin",
+      "Snoop Dogg",
+      "Ye"
+    ],
+    audioClips: {
+      "Drake": "audio/music/drake_music.wav",
+      "John Lennon": "audio/music/john-lennon_music.wav",
+      "Psy": "audio/music/psy_music.wav",
+      "Rick Rubin": "audio/music/rick-rubin_music.wav",
+      "Snoop Dogg": "audio/music/snoop-dogg_music.wav",
+      "Ye": "audio/music/ye_music.wav"
+    },
+    images: {
+      "Drake": "images/music/drake_music.jpg",
+      "John Lennon": "images/music/john-lennon_music.jpg",
+      "Psy": "images/music/psy_music.jpg",
+      "Rick Rubin": "images/music/rick-rubin_music.jpg",
+      "Snoop Dogg": "images/music/snoop-dogg_music.jpg",
+      "Ye": "images/music/ye_music.jpg"
     }
-  ],
-  Politics: [
-    {
-      id: 'politics1',
-      quote: "Ask not what your country can do for you, ask what you can do for your country.",
-      correctCelebrity: "John F. Kennedy",
-      celebrities: ["John F. Kennedy", "Barack Obama", "Winston Churchill", "Ronald Reagan", "Margaret Thatcher", "Abraham Lincoln"],
-      audioClips: {
-        "John F. Kennedy": "audio/politics/kennedy_ask.mp3",
-        "Barack Obama": "audio/politics/obama_ask.mp3",
-        "Winston Churchill": "audio/politics/churchill_ask.mp3",
-        "Ronald Reagan": "audio/politics/reagan_ask.mp3",
-        "Margaret Thatcher": "audio/politics/thatcher_ask.mp3",
-        "Abraham Lincoln": "audio/politics/lincoln_ask.mp3"
-      }
+  },
+  {
+    id: 'politics',
+    quote: "A majority has no right to vote away the rights of a minority.",
+    correctCelebrity: "Ayn Rand",
+    celebrities: [
+      "Ayn Rand",
+      "Bernie Sanders",
+      "Donald Trump",
+      "George W Bush",
+      "Richard Nixon",
+      "Xi Jinping"
+    ],
+    audioClips: {
+      "Ayn Rand": "audio/politics/ayn-rand_politics.wav",
+      "Bernie Sanders": "audio/politics/bernie-sanders_politics.wav",
+      "Donald Trump": "audio/politics/donald-trump_politics.wav",
+      "George W Bush": "audio/politics/george-w-bush_politics.wav",
+      "Richard Nixon": "audio/politics/richard-nixon_politics.wav",
+      "Xi Jinping": "audio/politics/xi-jinping_politics.wav"
+    },
+    images: {
+      "Ayn Rand": "images/politics/ayn-rand_politics.jpg",
+      "Bernie Sanders": "images/politics/bernie-sanders_politics.jpg",
+      "Donald Trump": "images/politics/donald-trump_politics.jpg",
+      "George W Bush": "images/politics/george-w-bush_politics.jpg",
+      "Richard Nixon": "images/politics/richard-nixon_politics.jpg",
+      "Xi Jinping": "images/politics/xi-jinping_politics.jpg"
     }
-  ],
-  History: [
-    {
-      id: 'history1',
-      quote: "I have a dream.",
-      correctCelebrity: "Martin Luther King Jr.",
-      celebrities: ["Martin Luther King Jr.", "Malcolm X", "Rosa Parks", "Nelson Mandela", "Gandhi", "Frederick Douglass"],
-      audioClips: {
-        "Martin Luther King Jr.": "audio/history/king_dream.mp3",
-        "Malcolm X": "audio/history/malcolm_dream.mp3",
-        "Rosa Parks": "audio/history/parks_dream.mp3",
-        "Nelson Mandela": "audio/history/mandela_dream.mp3",
-        "Gandhi": "audio/history/gandhi_dream.mp3",
-        "Frederick Douglass": "audio/history/douglass_dream.mp3"
-      }
+  },
+  {
+    id: 'history',
+    quote: "Do not compare yourself to others, if you do so you are insulting yourself.",
+    correctCelebrity: "Adolf Hitler",
+    celebrities: [
+      "Adolf Hitler",
+      "Jesus Christ",
+      "Julius Ceasar",
+      "Napoleon Bonaparte",
+      "Neil Armstrong",
+      "Sam Bankman Fried"
+    ],
+    audioClips: {
+      "Adolf Hitler": "audio/history/adolf-hitler_history.wav",
+      "Jesus Christ": "audio/history/jesus-christ_history.wav",
+      "Julius Ceasar": "audio/history/julius-ceasar_history.wav",
+      "Napoleon Bonaparte": "audio/history/napoleon-bonaparte_history.wav",
+      "Neil Armstrong": "audio/history/neil-armstrong_history.wav",
+      "Sam Bankman Fried": "audio/history/sam-bankman-fried_history.wav"
+    },
+    images: {
+      "Adolf Hitler": "images/history/adolf-hitler_history.jpg",
+      "Jesus Christ": "images/history/jesus-christ_history.jpg",
+      "Julius Ceasar": "images/history/julius-ceasar_history.jpg",
+      "Napoleon Bonaparte": "images/history/napoleon-bonaparte_history.jpg",
+      "Neil Armstrong": "images/history/neil-armstrong_history.jpg",
+      "Sam Bankman Fried": "images/history/sam-bankman-fried_history.jpg"
     }
-  ],
-  Sports: [
-    {
-      id: 'sports1',
-      quote: "Float like a butterfly, sting like a bee.",
-      correctCelebrity: "Muhammad Ali",
-      celebrities: ["Muhammad Ali", "Michael Jordan", "Serena Williams", "Usain Bolt", "Tiger Woods", "Simone Biles"],
-      audioClips: {
-        "Muhammad Ali": "audio/sports/ali_float.mp3",
-        "Michael Jordan": "audio/sports/jordan_float.mp3",
-        "Serena Williams": "audio/sports/williams_float.mp3",
-        "Usain Bolt": "audio/sports/bolt_float.mp3",
-        "Tiger Woods": "audio/sports/woods_float.mp3",
-        "Simone Biles": "audio/sports/biles_float.mp3"
-      }
+  },
+  {
+    id: 'sports',
+    quote: "I know what I need to do to win and I'm just really focussed on that.",
+    correctCelebrity: "Usain Bolt",
+    celebrities: [
+      "Conor McGregor",
+      "Cristiano Ronaldo",
+      "David Beckham",
+      "Messi",
+      "Usain Bolt",
+      "Yusuf Dikeç"
+    ],
+    audioClips: {
+      "Conor McGregor": "audio/sports/conor-mcgregor_sports.wav",
+      "Cristiano Ronaldo": "audio/sports/cristiano-ronaldo_sports.wav",
+      "David Beckham": "audio/sports/david-beckham_sports.wav",
+      "Messi": "audio/sports/messi_sports.wav",
+      "Usain Bolt": "audio/sports/usain-bolt_sports.wav",
+      "Yusuf Dikeç": "audio/sports/yusuf-dikec_sports.wav"
+    },
+    images: {
+      "Conor McGregor": "images/sports/conor-mcgregor_sports.jpg",
+      "Cristiano Ronaldo": "images/sports/cristiano-ronaldo_sports.jpg",
+      "David Beckham": "images/sports/david-beckham_sports.jpg",
+      "Messi": "images/sports/messi_sports.jpg",
+      "Usain Bolt": "images/sports/usain-bolt_sports.jpg",
+      "Yusuf Dikeç": "images/sports/yusuf-dikec_sports.jpg"
     }
-  ],
-  Academia: [
-    {
-      id: 'academia1',
-      quote: "Imagination is more important than knowledge.",
-      correctCelebrity: "Albert Einstein",
-      celebrities: ["Albert Einstein", "Stephen Hawking", "Marie Curie", "Neil deGrasse Tyson", "Jane Goodall", "Carl Sagan"],
-      audioClips: {
-        "Albert Einstein": "audio/academia/einstein_imagination.mp3",
-        "Stephen Hawking": "audio/academia/hawking_imagination.mp3",
-        "Marie Curie": "audio/academia/curie_imagination.mp3",
-        "Neil deGrasse Tyson": "audio/academia/tyson_imagination.mp3",
-        "Jane Goodall": "audio/academia/goodall_imagination.mp3",
-        "Carl Sagan": "audio/academia/sagan_imagination.mp3"
-      }
+  },
+  {
+    id: 'academia',
+    quote: "A scientist in his laboratory is not only a technician, he is also a child.",
+    correctCelebrity: "Marie Curie",
+    celebrities: [
+      "Albert Einstein",
+      "Da Vinci",
+      "He Jiankui",
+      "Jensen Huang",
+      "Marie Curie",
+      "Oppenheimer"
+    ],
+    audioClips: {
+      "Albert Einstein": "audio/academia/albert-einstein_academia.wav",
+      "Da Vinci": "audio/academia/da-vinci_academia.wav",
+      "He Jiankui": "audio/academia/he-jiankui_academia.wav",
+      "Jensen Huang": "audio/academia/jensen-huang_academia.wav",
+      "Marie Curie": "audio/academia/marie-curie_academia.wav",
+      "Oppenheimer": "audio/academia/oppenheimer_academia.wav"
+    },
+    images: {
+      "Albert Einstein": "images/academia/albert-einstein_academia.jpg",
+      "Da Vinci": "images/academia/da-vinci_academia.jpg",
+      "He Jiankui": "images/academia/he-jiankui_academia.jpg",
+      "Jensen Huang": "images/academia/jensen-huang_academia.jpg",
+      "Marie Curie": "images/academia/marie-curie_academia.jpg",
+      "Oppenheimer": "images/academia/oppenheimer_academia.jpg"
     }
-  ]
-};
+  }
+];
+
+type GameCategory = 'Music' | 'Politics' | 'Movies' | 'History' | 'Sports' | 'Academia';
+
+interface GameData {
+  quoteData: QuoteData;
+}
+
+interface GameResponse {
+  category: string;
+  quoteData: QuoteData;
+}
+
+function getGameData(category: string): GameResponse {
+  // Find the quote data for the selected category
+  const quoteData = MOCK_QUOTES.find(quote => {
+    // Extract the category from the ID (e.g., 'music1' -> 'music')
+    const quoteCategory = quote.id.split('1')[0].toLowerCase();
+    const inputCategory = category.toLowerCase();
+    console.log('Comparing categories:', { quoteCategory, inputCategory });
+    return quoteCategory === inputCategory;
+  });
+  
+  if (!quoteData) {
+    console.error(`Invalid category selected: ${category}`);
+    throw new Error(`Invalid category: ${category}`);
+  }
+
+  console.log('Found quote data for category:', category, quoteData);
+  return {
+    category,
+    quoteData: quoteData
+  };
+}
 
 // Add a custom post type to Devvit
 Devvit.addCustomPostType({
@@ -129,26 +240,6 @@ Devvit.addCustomPostType({
     // Helper function to get asset URL for audio files
     const getAudioURL = (path: string) => {
       return context.assets.getURL(path);
-    };
-
-    // Create game data with properly formatted audio URLs
-    const getGameData = (category: string) => {
-      const categoryQuotes = MOCK_QUOTES[category];
-      const randomQuote = {...categoryQuotes[Math.floor(Math.random() * categoryQuotes.length)]};
-      
-      // Convert audio clip paths to asset URLs
-      const audioClips: Record<string, string> = {};
-      for (const [celeb, path] of Object.entries(randomQuote.audioClips)) {
-        audioClips[celeb] = getAudioURL(path);
-      }
-      
-      // Replace the audio clips with the proper URLs
-      randomQuote.audioClips = audioClips;
-      
-      return {
-        category,
-        quoteData: randomQuote
-      };
     };
 
     // Load username with proper error handling and caching
@@ -246,38 +337,52 @@ Devvit.addCustomPostType({
             
           case 'readyForGameData':
             console.log('Webview ready for game data, sending current state');
-            // Send current state immediately
-            webView.postMessage({
-              type: 'initialData',
-              data: {
-                username,
-                currentCounter: score,
-              },
-            });
-            // If we have a selected category, send game data
-            if (selectedCategory) {
-              const gameData = getGameData(selectedCategory);
-              webView.postMessage({
-                type: 'gameData',
-                data: gameData,
-              });
-            }
-            break;
+            console.log('Selected category:', selectedCategory);
             
-          case 'categorySelected':
-            setSelectedCategory(message.data.category);
-            const gameData = getGameData(message.data.category);
-            // Send current state with game data
-            webView.postMessage({
-              type: 'initialData',
-              data: {
-                username,
-                currentCounter: score,
-              },
-            });
+            // If no category is selected, wait for one
+            if (!selectedCategory) {
+              console.log('No category selected yet, waiting for selection');
+              return;
+            }
+            
+            const gameData = getGameData(selectedCategory);
+            console.log('Sending game data for category:', selectedCategory);
+            console.log('Game data:', gameData);
+            
+            // Send game data first
             webView.postMessage({
               type: 'gameData',
               data: gameData,
+            });
+            
+            // Then send current state
+            webView.postMessage({
+              type: 'initialData',
+              data: {
+                username,
+                currentCounter: score,
+              },
+            });
+            break;
+            
+          case 'categorySelected':
+            console.log('Category selected:', message.data.category);
+            setSelectedCategory(message.data.category);
+            
+            // Get and send game data immediately
+            const newGameData = getGameData(message.data.category);
+            webView.postMessage({
+              type: 'gameData',
+              data: newGameData,
+            });
+            
+            // Then send current state
+            webView.postMessage({
+              type: 'initialData',
+              data: {
+                username,
+                currentCounter: score,
+              },
             });
             break;
             
@@ -357,7 +462,10 @@ Devvit.addCustomPostType({
       const gameState = await initializeGameState();
       
       const gameData = getGameData(category);
-      console.log('Game data prepared, quoteId:', gameData.quoteData.id);
+      console.log('Game data prepared for category:', category);
+      console.log('Quote ID:', gameData.quoteData.id);
+      console.log('Correct celebrity:', gameData.quoteData.correctCelebrity);
+      console.log('Celebrities:', gameData.quoteData.celebrities);
       
       // Send game data and initial data to webview
       webView.postMessage({
@@ -392,18 +500,15 @@ Devvit.addCustomPostType({
           
           <spacer size="medium" />
           
-          <text size="xlarge" weight="bold" color="white">
-            Hear Say!?
-          </text>
+          <vstack gap="medium" padding="medium">
+            <text size="xlarge" color="white">Hear Say!?</text>
+            <text size="large" color="white">Who Said That?</text>
+          </vstack>
           
           <hstack gap="small">
             <text size="xlarge" color="white">Player: </text>
             <text size="xlarge" weight="bold" color="#F5F834">
               {isLoading ? 'Loading...' : username}
-            </text>
-            <text size="xlarge" color="white"> | Score: </text>
-            <text size="xlarge" weight="bold" color="#F5F834">
-              {isLoading ? '0' : score}
             </text>
           </hstack>
           

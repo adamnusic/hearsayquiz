@@ -8,11 +8,11 @@ export type DevvitMessage =
 /** Message from the web view to Devvit. */
 export type WebViewMessage =
   | { type: 'webViewReady' }
-  | { type: 'setCounter'; data: { newCounter: number } }
+  | { type: 'setCounter'; data: { count: number } }
   | { type: 'microphoneInitiated' }
-  | { type: 'microphoneData'; data: { volume: number; error?: string } }
+  | { type: 'microphoneData'; data: { audioData: string } }
   | { type: 'categorySelected'; data: { category: string } }
-  | { type: 'quoteAnswered'; data: { correct: boolean; score: number } }
+  | { type: 'quoteAnswered'; data: { selectedCelebrity: string; correct: boolean; score: number } }
   | { type: 'playAgain' }
   | { type: 'readyForGameData' };
 
@@ -29,10 +29,11 @@ export type DevvitSystemMessage = {
 /**
  * Data structure for a quote in the Hear Say!? game
  */
-export type QuoteData = {
+export interface QuoteData {
   id: string;
   quote: string;
   correctCelebrity: string;
   celebrities: string[];
   audioClips: Record<string, string>;
-};
+  images: Record<string, string>;
+}

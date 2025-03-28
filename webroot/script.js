@@ -8,7 +8,7 @@
 
 // ===== Game State =====
 let gameState = {
-  username: 'Guest',
+  username: 'anon',
   score: 0,
   currentCategory: null,
   currentQuote: null,
@@ -71,6 +71,12 @@ function setupMessageListener() {
         type: 'initialData',
         data: event.data.data
       });
+    } else if (event.data?.type === 'gameData') {
+      console.log('Processing gameData message directly:', event.data);
+      handleDevvitMessage({
+        type: 'gameData',
+        data: event.data.data
+      });
     } else {
       console.log('Not a devvit message, ignoring');
     }
@@ -114,99 +120,24 @@ function sendMessage(message) {
 
 // Handle messages from the blocks view
 function handleDevvitMessage(message) {
-  console.log('Processing Devvit message:', message);
-  window.logDiagnostic(`⬇️ ${message.type}`);
+  console.log('Received message from Devvit:', message);
+  window.logDiagnostic(`Received message type: ${message.type}`);
   
   switch (message.type) {
     case 'initialData':
-      console.log('Processing initialData message:', message.data);
-      window.logDiagnostic(`Processing initialData: username=${message.data.username}, score=${message.data.currentCounter}`);
-      
-      // Update game state
-      gameState.username = message.data.username;
-      gameState.score = message.data.currentCounter;
-      
-      // Update UI elements
-      const usernameEl = document.getElementById('username');
-      const scoreEl = document.getElementById('score');
-      
-      console.log('Found username element:', !!usernameEl);
-      console.log('Found score element:', !!scoreEl);
-      
-      if (usernameEl) {
-        usernameEl.textContent = gameState.username;
-        console.log('Updated username element to:', gameState.username);
-        window.logDiagnostic(`Updated username to: ${gameState.username}`);
-      } else {
-        console.error('Could not find username element');
-        window.logDiagnostic('ERROR: Could not find username element');
-      }
-      
-      if (scoreEl) {
-        scoreEl.textContent = gameState.score;
-        console.log('Updated score element to:', gameState.score);
-        window.logDiagnostic(`Updated score to: ${gameState.score}`);
-      } else {
-        console.error('Could not find score element');
-        window.logDiagnostic('ERROR: Could not find score element');
-      }
-      
-      // Store the data but don't request game data yet - wait for START GAME button
-      window.gameDataRequested = false;
-      window.logDiagnostic('Waiting for user to click START GAME button');
+      console.log('Received initial data:', message.data);
       break;
       
     case 'gameData':
       console.log('Received game data:', message.data);
-      window.logDiagnostic(`Game data for "${message.data.category}" received`);
-      
-      // Log detailed information about the received data
-      if (message.data && message.data.quoteData) {
-        console.log('Quote text:', message.data.quoteData.quote);
-        console.log('Correct celebrity:', message.data.quoteData.correctCelebrity);
-        console.log('Celebrities array:', message.data.quoteData.celebrities);
-        console.log('Audio clips:', Object.keys(message.data.quoteData.audioClips || {}));
-        
-        // Check if audio clips use asset URLs
-        const audioSample = Object.values(message.data.quoteData.audioClips || {})[0];
-        if (audioSample) {
-          console.log('Audio URL sample:', audioSample);
-          window.logDiagnostic(`Audio URL: ${audioSample.substring(0, 30)}...`);
-        } else {
-          console.error('No audio clips found in quote data');
-          window.logDiagnostic('ERROR: No audio clips in quote data');
-        }
-      } else {
-        console.error('Invalid or missing quote data structure');
-        window.logDiagnostic('ERROR: Invalid quote data structure');
-      }
-      
-      // Make sure we have valid data before proceeding
-      if (!message.data || !message.data.category || !message.data.quoteData) {
-        console.error('Invalid game data received!');
-        window.logDiagnostic('ERROR: Invalid game data structure');
-        
-        // Show an error message on the screen
-        const errorMsg = document.createElement('div');
-        errorMsg.style.color = 'red';
-        errorMsg.style.padding = '20px';
-        errorMsg.style.textAlign = 'center';
-        errorMsg.innerHTML = `<strong>Error:</strong> Invalid game data received!<br>
-          <button onclick="window.testReceiveGameData()" style="margin-top: 10px; padding: 5px 10px;">
-            Load Test Data
-          </button>`;
-        
-        if (celebritiesContainer) {
-          celebritiesContainer.innerHTML = '';
-          celebritiesContainer.appendChild(errorMsg);
-        }
-        
+      if (!message.data || !message.data.quoteData) {
+        console.error('Invalid game data received:', message.data);
+        window.logDiagnostic('ERROR: Invalid game data received');
         return;
       }
       
-      // Refresh DOM references to ensure we have all the elements we need
-      refreshDOMReferences();
-      
+      // Store the game data
+      window.currentQuoteData = message.data.quoteData;
       gameState.currentCategory = message.data.category;
       gameState.currentQuote = message.data.quoteData;
       gameState.lastPlayedCategory = message.data.category;
@@ -216,36 +147,31 @@ function handleDevvitMessage(message) {
         gameState.playedCategories.push(message.data.category);
       }
       
-      // Remove the loading indicator if present - game can now start
-      const loadingIndicator = document.getElementById('initial-loading-indicator');
-      if (loadingIndicator) {
-        loadingIndicator.remove();
-        window.logDiagnostic("Removed loading indicator in gameData handler");
+      // Update quote text
+      if (window.quoteTextElement) {
+        window.quoteTextElement.textContent = `"${message.data.quoteData.quote}"`;
+      }
+      
+      // Update category
+      if (window.currentCategoryElement) {
+        window.currentCategoryElement.textContent = message.data.category;
       }
       
       // Start the game with the received data
-      window.logDiagnostic('Starting game with received data');
       startGame(message.data.category, message.data.quoteData);
       break;
-    
-    case 'leaderboardData':
-      if (message.data && Array.isArray(message.data)) {
-        gameState.leaderboard = message.data;
-        updateLeaderboard();
-        // Show the leaderboard screen if that's where the data was requested from
-        if (leaderboardScreen.classList.contains('active')) {
-          showScreen(leaderboardScreen);
-        }
-      }
+      
+    case 'scoreUpdate':
+      console.log('Received score update:', message.data);
+      break;
+      
+    case 'gameComplete':
+      console.log('Game complete:', message.data);
       break;
       
     default:
       console.log('Unknown message type:', message.type);
-      window.logDiagnostic(`Unknown message type: ${message.type}`);
   }
-  
-  // Make sure background is visible
-  ensureBackgroundVisible();
 }
 
 // ===== Game Screens =====
@@ -872,190 +798,93 @@ function createDummyAudio() {
 }
 
 // Start the game with a quote and celebrities
-function startGame(category, quoteData) {
-  console.log('Starting game with data:', quoteData);
-  window.logDiagnostic(`Starting game for category: ${category}`);
+function startGame(category, receivedQuoteData) {
+  window.logDiagnostic('Starting game...');
   
-  try {
-    // Remove loading indicator if present
-    const loadingIndicator = document.getElementById('initial-loading-indicator');
-    if (loadingIndicator) {
-      loadingIndicator.remove();
-      window.logDiagnostic("Removed loading indicator in startGame");
-    }
-    
-    // Enable audio for the game
-    enableGameAudio();
-    
-    // Refresh DOM references first to ensure we have everything
-    refreshDOMReferences();
-    
-    // Set game state
-    gameState.isPlaying = true;
-    gameState.selectedCelebrity = null;
-    
-    // Make sure DOM elements are available
-    if (!gamePlayScreen || !celebritiesContainer || !quoteTextElement) {
-      console.error("Key game elements not found - trying to get them directly from the DOM");
-      window.logDiagnostic("ERROR: Key game elements not found - trying direct DOM access");
-      
-      // Try to get elements directly
-      const directGamePlayScreen = document.getElementById('game-play');
-      const directCelebritiesContainer = document.getElementById('celebrities-container');
-      const directQuoteTextElement = document.getElementById('quote-text');
-      
-      if (directGamePlayScreen) {
-        gamePlayScreen = directGamePlayScreen;
-        window.gamePlayScreen = directGamePlayScreen;
-        window.logDiagnostic("Found game-play screen via direct DOM access");
-      }
-      
-      if (directCelebritiesContainer) {
-        celebritiesContainer = directCelebritiesContainer;
-        window.celebritiesContainer = directCelebritiesContainer;
-        window.logDiagnostic("Found celebrities-container via direct DOM access");
-      }
-      
-      if (directQuoteTextElement) {
-        quoteTextElement = directQuoteTextElement;
-        window.quoteTextElement = directQuoteTextElement;
-        window.logDiagnostic("Found quote-text element via direct DOM access");
-      }
-      
-      // Check again after direct access attempts
-      if (!gamePlayScreen || !celebritiesContainer || !quoteTextElement) {
-        window.logDiagnostic("CRITICAL ERROR: Still can't find key game elements!");
-        console.error("CRITICAL ERROR: Still can't find key game elements!");
-        
-        // Create a visible error message for the user
-        const errorMessage = document.createElement('div');
-        errorMessage.style.position = 'fixed';
-        errorMessage.style.top = '50%';
-        errorMessage.style.left = '50%';
-        errorMessage.style.transform = 'translate(-50%, -50%)';
-        errorMessage.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
-        errorMessage.style.color = 'white';
-        errorMessage.style.padding = '20px';
-        errorMessage.style.borderRadius = '10px';
-        errorMessage.style.zIndex = '9999';
-        errorMessage.style.textAlign = 'center';
-        errorMessage.style.maxWidth = '80%';
-        
-        errorMessage.innerHTML = `
-          <h3 style="color: red;">Error Loading Game</h3>
-          <p>Could not find required game elements</p>
-          <button id="reload-game-btn" style="
-            background-color: #F5F834;
-            color: black;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            margin-top: 15px;
-            font-weight: bold;
-            cursor: pointer;">
-            Reload Game
-          </button>
-        `;
-        
-        document.body.appendChild(errorMessage);
-        
-        // Add event listener for reload button
-        document.getElementById('reload-game-btn').addEventListener('click', () => {
-          window.location.reload();
-        });
-        
-        return;
-      }
-    }
-    
-    // Hide all screens first
-    document.querySelectorAll('.game-screen').forEach(screen => {
-      screen.style.display = 'none';
-    });
-    
-    // Ensure the game play screen is visible
-    window.logDiagnostic("Showing game play screen");
-    gamePlayScreen.style.display = 'flex';
-    gamePlayScreen.classList.add('active');
-    
-    // Optimize the game play screen layout for better fit
-    optimizeGamePlayLayout();
-    
-    // Update current category display
-    const currentCategoryEl = currentCategoryElement || document.getElementById('current-category');
-    if (currentCategoryEl) {
-      currentCategoryEl.textContent = category;
-    }
-    
-    // Update quote text
-    const quoteTextEl = quoteTextElement || document.getElementById('quote-text');
-    if (quoteTextEl) {
-      quoteTextEl.textContent = `"${quoteData.quote}"`;
-      // Limit max height of quote text to prevent overflow
-      quoteTextEl.style.maxHeight = '80px';
-      quoteTextEl.style.overflow = 'auto';
-      console.log("Quote text updated:", quoteData.quote);
-      window.logDiagnostic(`Quote text updated: "${quoteData.quote.substring(0, 30)}..."`);
-    }
-    
-    // Clear previous content in celebrities container
-    const celebritiesContainerEl = celebritiesContainer || document.getElementById('celebrities-container');
-    if (celebritiesContainerEl) {
-      celebritiesContainerEl.innerHTML = '';
-    }
-    
-    // Create buttons for each celebrity
-    console.log('Creating celebrity buttons:', quoteData.celebrities);
-    window.logDiagnostic(`Creating ${quoteData.celebrities.length} celebrity buttons`);
-    
-    createButtonsFromQuoteData(quoteData);
-    
-    // Reset and start the timer as the last step, after everything is set up
-    resetTimer();
-    startTimer();
-    window.logDiagnostic("Game setup complete, timer started");
-    } catch (error) {
-    console.error("Error starting game:", error);
-    window.logDiagnostic(`ERROR starting game: ${error.message}`);
-    
-    // Create a visible error message for the user
-    const errorMessage = document.createElement('div');
-    errorMessage.style.position = 'fixed';
-    errorMessage.style.top = '50%';
-    errorMessage.style.left = '50%';
-    errorMessage.style.transform = 'translate(-50%, -50%)';
-    errorMessage.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
-    errorMessage.style.color = 'white';
-    errorMessage.style.padding = '20px';
-    errorMessage.style.borderRadius = '10px';
-    errorMessage.style.zIndex = '9999';
-    errorMessage.style.textAlign = 'center';
-    errorMessage.style.maxWidth = '80%';
-    
-    errorMessage.innerHTML = `
-      <h3 style="color: red;">Error Starting Game</h3>
-      <p>${error.message}</p>
-      <button id="retry-game-btn" style="
-        background-color: #F5F834;
-        color: black;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        margin-top: 15px;
-        font-weight: bold;
-        cursor: pointer;">
-        Try Again
-      </button>
-    `;
-    
-    document.body.appendChild(errorMessage);
-    
-    // Add event listener for retry button
-    document.getElementById('retry-game-btn').addEventListener('click', () => {
-      errorMessage.remove();
-      window.testReceiveGameData();
-    });
+  // Remove loading indicator
+  const loadingIndicator = document.getElementById('loading-indicator');
+  if (loadingIndicator) {
+    loadingIndicator.style.display = 'none';
   }
+  
+  // Set up game state
+  window.logDiagnostic('Setting up game state...');
+  gameState.isPlaying = true;
+  gameState.currentCategory = category;
+  gameState.currentQuote = receivedQuoteData || CATEGORY_DATA[category.toLowerCase()];
+  
+  // Ensure all required game elements exist
+  window.logDiagnostic('Verifying game elements...');
+  const requiredElements = [
+    { id: 'game-play', name: 'Game Play Screen' },
+    { id: 'celebrities-container', name: 'Celebrities Container' },
+    { id: 'quote-text', name: 'Quote Text' },
+    { id: 'timer-bar', name: 'Timer Bar' },
+    { id: 'timer-text', name: 'Timer Text' },
+    { id: 'timer-container', name: 'Timer Container' }
+  ];
+  
+  let allElementsFound = true;
+  requiredElements.forEach(({ id, name }) => {
+    const element = document.getElementById(id);
+    if (element) {
+      window.logDiagnostic(`FOUND: ${name} (${id})`);
+    } else {
+      window.logDiagnostic(`MISSING: ${name} (${id})`);
+      allElementsFound = false;
+    }
+  });
+  
+  if (!allElementsFound) {
+    window.logDiagnostic('ERROR: Some required elements are missing');
+    return;
+  }
+  
+  // Hide all screens
+  window.logDiagnostic('Hiding all screens...');
+  document.querySelectorAll('.game-screen').forEach(screen => {
+    screen.classList.remove('active');
+    screen.style.display = 'none';
+  });
+  
+  // Show game play screen
+  const gamePlayScreen = document.getElementById('game-play');
+  if (gamePlayScreen) {
+    gamePlayScreen.classList.add('active');
+    gamePlayScreen.style.display = 'flex';
+  }
+  
+  // Set element references
+  window.logDiagnostic('Setting element references...');
+  window.quoteTextElement = document.getElementById('quote-text');
+  window.celebritiesContainer = document.getElementById('celebrities-container');
+  window.timerBar = document.getElementById('timer-bar');
+  window.timerText = document.getElementById('timer-text');
+  window.timerContainer = document.getElementById('timer-container');
+  
+  // Apply styles to elements
+  window.logDiagnostic('Applying styles...');
+  if (window.timerContainer) {
+    window.timerContainer.style.position = 'absolute';
+    window.timerContainer.style.top = '0';
+    window.timerContainer.style.left = '0';
+    window.timerContainer.style.width = '100%';
+    window.timerContainer.style.zIndex = '1000';
+  }
+  
+  // Create celebrity buttons with images
+  window.logDiagnostic('Creating celebrity buttons...');
+  createCelebrityButtons(category);
+  
+  // Initialize audio
+  window.logDiagnostic('Initializing audio...');
+  enableGameAudio();
+  
+  // Start the timer
+  window.logDiagnostic('Starting timer...');
+  startTimer();
+  
+  window.logDiagnostic('Game started successfully');
 }
 
 // Helper function to optimize game play layout
@@ -2434,8 +2263,68 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(window.fixBackground, 500);
 });
 
+// Category-specific quiz data
+const CATEGORY_DATA = {
+  music: {
+    id: 'music1',
+    quote: "A lot of people don't appreciate the moment until it's passed.",
+    correctCelebrity: "Ye",
+    celebrities: ["Drake", "John Lennon", "Psy", "Rick Rubin", "Snoop Dogg", "Ye"],
+    audioClips: {
+      "Drake": "audio/music/drake_music.wav",
+      "John Lennon": "audio/music/john-lennon_music.wav",
+      "Psy": "audio/music/psy_music.wav",
+      "Rick Rubin": "audio/music/rick-rubin_music.wav",
+      "Snoop Dogg": "audio/music/snoop-dogg_music.wav",
+      "Ye": "audio/music/ye_music.wav"
+    }
+  },
+  movies: {
+    id: 'movies1',
+    quote: "It does not do to dwell on dreams and forget to live.",
+    correctCelebrity: "Harry Potter",
+    celebrities: ["Alex DeLarge", "Darth Vader", "Don Corleone", "Harry Potter", "Jules Winnfield", "Robocop"],
+    audioClips: {
+      "Alex DeLarge": "audio/movies/alex-delarge_movies.wav",
+      "Darth Vader": "audio/movies/darth-vader_movies.wav",
+      "Don Corleone": "audio/movies/don-corleone_movies.wav",
+      "Harry Potter": "audio/movies/harry-potter_movies.wav",
+      "Jules Winnfield": "audio/movies/jules-winnfield_movies.wav",
+      "Robocop": "audio/movies/robocop_movies.wav"
+    }
+  },
+  sports: {
+    id: 'sports1',
+    quote: "I've failed over and over and over again in my life and that is why I succeed.",
+    correctCelebrity: "Michael Jordan",
+    celebrities: ["Kobe Bryant", "LeBron James", "Michael Jordan", "Muhammad Ali", "Serena Williams", "Tom Brady"],
+    audioClips: {
+      "Kobe Bryant": "audio/sports/kobe-bryant_sports.wav",
+      "LeBron James": "audio/sports/lebron-james_sports.wav",
+      "Michael Jordan": "audio/sports/michael-jordan_sports.wav",
+      "Muhammad Ali": "audio/sports/muhammad-ali_sports.wav",
+      "Serena Williams": "audio/sports/serena-williams_sports.wav",
+      "Tom Brady": "audio/sports/tom-brady_sports.wav"
+    }
+  },
+  politics: {
+    id: 'politics1',
+    quote: "The only thing we have to fear is fear itself.",
+    correctCelebrity: "Franklin D. Roosevelt",
+    celebrities: ["Barack Obama", "Franklin D. Roosevelt", "John F. Kennedy", "Martin Luther King Jr.", "Nelson Mandela", "Winston Churchill"],
+    audioClips: {
+      "Barack Obama": "audio/politics/barack-obama_politics.wav",
+      "Franklin D. Roosevelt": "audio/politics/fdr_politics.wav",
+      "John F. Kennedy": "audio/politics/jfk_politics.wav",
+      "Martin Luther King Jr.": "audio/politics/mlk_politics.wav",
+      "Nelson Mandela": "audio/politics/nelson-mandela_politics.wav",
+      "Winston Churchill": "audio/politics/winston-churchill_politics.wav"
+    }
+  }
+};
+
 // Simplified function to create celebrity buttons with real audio
-window.createCelebrityButtons = function() {
+window.createCelebrityButtons = function(category) {
   // Make sure we have the container
   let container = window.celebritiesContainer || document.getElementById('celebrities-container');
   
@@ -2455,7 +2344,7 @@ window.createCelebrityButtons = function() {
     container = document.createElement('div');
     container.id = 'celebrities-container';
     container.style.padding = '0';
-    container.style.margin = '8px 0 0 0'; // Added top margin to separate from quote
+    container.style.margin = '8px 0 0 0';
     container.style.width = '100%';
     container.style.boxSizing = 'border-box';
     
@@ -2464,107 +2353,85 @@ window.createCelebrityButtons = function() {
     
     if (quoteContainer && quoteContainer.parentNode === gamePlayScreen) {
       gamePlayScreen.insertBefore(container, quoteContainer.nextSibling);
-          } else {
-      // Just append to the game play screen
+    } else {
       gamePlayScreen.appendChild(container);
     }
     
-    // Update the global reference
     window.celebritiesContainer = container;
   }
   
   // Clear the container
   container.innerHTML = '';
   
-  // Style the container to match the category-container
+  // Style the container
   container.style.display = 'grid';
   container.style.gridTemplateColumns = 'repeat(2, 1fr)';
-  container.style.gap = '0.6rem'; // Further reduced gap
+  container.style.gap = '0.6rem';
   container.style.width = '100%';
-  container.style.margin = '16px 0 0 0'; // Increased from 8px to 16px
-  container.style.padding = '8px 0'; // Added vertical padding
+  container.style.margin = '16px 0 0 0';
+  container.style.padding = '8px 0';
   container.style.border = 'none';
   container.style.boxSizing = 'border-box';
   container.style.maxHeight = 'calc(100vh - 150px)';
   container.style.overflowY = 'auto';
   
-  // Create celebrity buttons with real audio paths
-  const celebrities = [
-    "Drake",
-    "John Lennon",
-    "Psy",
-    "Rick Rubin",
-    "Snoop Dogg",
-    "Ye"
-  ];
+  // Get the quote data for the selected category
+  const quoteData = CATEGORY_DATA[category.toLowerCase()];
+  if (!quoteData) {
+    console.error('Invalid category:', category);
+    window.logDiagnostic(`ERROR: Invalid category: ${category}`);
+    return;
+  }
   
-  // Map of celebrities to their audio files (using actual files in webroot/audio/music)
-  const audioFiles = {
-    "Drake": "audio/music/drake_music.wav",
-    "John Lennon": "audio/music/john-lennon_music.wav",
-    "Psy": "audio/music/psy_music.wav",
-    "Rick Rubin": "audio/music/rick-rubin_music.wav",
-    "Snoop Dogg": "audio/music/snoop-dogg_music.wav",
-    "Ye": "audio/music/ye_music.wav"
-  };
-  
-  // Create and store the quote data for later use
-  window.currentQuoteData = {
-    id: 'music1',
-    quote: "A lot of people don't appreciate the moment until it's passed.",
-    correctCelebrity: "Ye",
-    celebrities: celebrities,
-    audioClips: audioFiles
-  };
-  
-  // Update game state to use our quote data
-  gameState.currentCategory = "Music";
-  gameState.currentQuote = window.currentQuoteData;
-  gameState.lastPlayedCategory = "Music";
+  // Store the quote data for later use
+  window.currentQuoteData = quoteData;
+  gameState.currentCategory = category;
+  gameState.currentQuote = quoteData;
+  gameState.lastPlayedCategory = category;
   
   // Add category to played categories if not already there
-  if (!gameState.playedCategories.includes("Music")) {
-    gameState.playedCategories.push("Music");
+  if (!gameState.playedCategories.includes(category)) {
+    gameState.playedCategories.push(category);
   }
   
   // Update quote text
   if (window.quoteTextElement) {
-    window.quoteTextElement.textContent = `"${window.currentQuoteData.quote}"`;
+    window.quoteTextElement.textContent = `"${quoteData.quote}"`;
   }
   
   // Update category
   if (window.currentCategoryElement) {
-    window.currentCategoryElement.textContent = "Music";
+    window.currentCategoryElement.textContent = category;
   }
   
-  // Create buttons for each celebrity with dark bg and yellow outline
-  celebrities.forEach(celeb => {
+  // Create buttons for each celebrity
+  quoteData.celebrities.forEach(celeb => {
     const button = document.createElement('button');
     button.className = 'celebrity-button';
     
-    // Match the category button styling but with dark background and yellow outline
-    button.style.padding = '0.7rem 0.2rem'; // Further reduced padding by ~20%
-    button.style.border = '2px solid var(--primary-color, #F5F834)'; // Reduced border thickness
-    button.style.borderRadius = 'var(--border-radius, 6px)'; // Smaller border radius
-    button.style.backgroundColor = '#121212'; // Dark background
-    button.style.color = 'white'; // White text for visibility
-    button.style.fontSize = '0.9rem'; // Further reduced font
+    // Style the button
+    button.style.padding = '0.7rem 0.2rem';
+    button.style.border = '2px solid var(--primary-color, #F5F834)';
+    button.style.borderRadius = 'var(--border-radius, 6px)';
+    button.style.backgroundColor = '#121212';
+    button.style.color = 'white';
+    button.style.fontSize = '0.9rem';
     button.style.fontWeight = '700';
     button.style.cursor = 'pointer';
     button.style.transition = 'var(--transition, all 0.3s ease)';
-    button.style.boxShadow = '0 3px 8px var(--button-shadow, rgba(0, 0, 0, 0.3))'; // Smaller shadow
+    button.style.boxShadow = '0 3px 8px var(--button-shadow, rgba(0, 0, 0, 0.3))';
     button.style.display = 'flex';
     button.style.flexDirection = 'column';
     button.style.alignItems = 'center';
     button.style.justifyContent = 'center';
-    button.style.gap = '0.5rem'; // Further reduced gap
+    button.style.gap = '0.5rem';
     button.style.position = 'relative';
     button.style.overflow = 'hidden';
-    button.style.height = 'auto'; // Allow natural height
+    button.style.height = 'auto';
     button.style.width = '100%';
-    button.style.minHeight = '95px'; // Further reduced from 120px to ~95px
+    button.style.minHeight = '95px';
     
-    // Add the shine effect (like category buttons)
+    // Add shine effect
     const shine = document.createElement('div');
     shine.style.position = 'absolute';
     shine.style.top = '0';
@@ -2576,11 +2443,11 @@ window.createCelebrityButtons = function() {
     shine.style.transition = '0.6s';
     button.appendChild(shine);
     
-    // Add enhanced hover effects
+    // Add hover effects
     button.addEventListener('mouseover', () => {
-      button.style.transform = 'translateY(-3px)'; // Reduced movement
-      button.style.boxShadow = '0 6px 12px var(--button-shadow, rgba(0, 0, 0, 0.4))'; // Smaller shadow
-      button.style.borderColor = 'white'; // Highlight border on hover
+      button.style.transform = 'translateY(-3px)';
+      button.style.boxShadow = '0 6px 12px var(--button-shadow, rgba(0, 0, 0, 0.4))';
+      button.style.borderColor = 'white';
       shine.style.transform = 'translateX(100%)';
     });
     
@@ -2601,19 +2468,19 @@ window.createCelebrityButtons = function() {
       button.style.boxShadow = '0 6px 12px var(--button-shadow, rgba(0, 0, 0, 0.4))';
     });
     
-    // Create image element for celebrity - FURTHER REDUCED SIZE
+    // Create image element
     const imgContainer = document.createElement('div');
-    imgContainer.style.width = '70px'; // Further reduced from 70px
-    imgContainer.style.height = '70px'; // Further reduced from 70px
+    imgContainer.style.width = '70px';
+    imgContainer.style.height = '70px';
     imgContainer.style.borderRadius = '50%';
     imgContainer.style.overflow = 'hidden';
     imgContainer.style.marginBottom = '0.2rem';
-    imgContainer.style.backgroundColor = '#333'; // Darker background for placeholders
+    imgContainer.style.backgroundColor = '#333';
     imgContainer.style.display = 'flex';
     imgContainer.style.justifyContent = 'center';
     imgContainer.style.alignItems = 'center';
-    imgContainer.style.border = '2px solid var(--primary-color, #F5F834)'; // Reduced border thickness
-    imgContainer.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.3)'; // Smaller shadow
+    imgContainer.style.border = '2px solid var(--primary-color, #F5F834)';
+    imgContainer.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.3)';
     imgContainer.style.transition = 'transform 0.3s ease';
     
     const img = document.createElement('img');
@@ -2622,77 +2489,31 @@ window.createCelebrityButtons = function() {
     img.style.objectFit = 'cover';
     img.alt = celeb;
     
-    // Try to load celebrity image
-    const imageName = celeb.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
-    img.src = `celebrity-images/${imageName}.jpg`;
-    
-    // Add hover effect for image
-    button.addEventListener('mouseover', () => {
-      imgContainer.style.transform = 'scale(1.1)'; // Reduced scale effect
-      imgContainer.style.borderColor = 'white';
-    });
-    
-    button.addEventListener('mouseout', () => {
-      imgContainer.style.transform = '';
-      imgContainer.style.borderColor = 'var(--primary-color, #F5F834)';
-    });
-    
-    // If image fails to load, use a placeholder with initials
-    img.onerror = () => {
-      img.style.display = 'none';
-      
-      // Create a placeholder with initials
-      const initials = document.createElement('div');
-      initials.style.width = '100%';
-      initials.style.height = '100%';
-      initials.style.display = 'flex';
-      initials.style.justifyContent = 'center';
-      initials.style.alignItems = 'center';
-      initials.style.backgroundColor = getRandomColor(celeb);
-      initials.style.color = 'white';
-      initials.style.fontWeight = 'bold';
-      initials.style.fontSize = '20px'; // Further reduced from 26px
-      
-      // Get initials from celebrity name
-      const initialsText = celeb
-        .split(' ')
-        .map(word => word.charAt(0))
-        .join('')
-        .toUpperCase();
-      
-      initials.textContent = initialsText;
-      imgContainer.appendChild(initials);
-    };
+    // Set image source
+    img.src = `assets/celebrities/${celeb.toLowerCase().replace(/\s+/g, '-')}.jpg`;
+    window.logDiagnostic(`Setting image for ${celeb}: assets/celebrities/${celeb.toLowerCase().replace(/\s+/g, '-')}.jpg`);
     
     imgContainer.appendChild(img);
-    
-    // Add name text
-    const nameText = document.createElement('span');
-    nameText.textContent = celeb;
-    nameText.style.textAlign = 'center';
-    nameText.style.fontWeight = 'bold';
-    nameText.style.maxWidth = '100%';
-    nameText.style.overflow = 'hidden';
-    nameText.style.textOverflow = 'ellipsis';
-    nameText.style.whiteSpace = 'nowrap';
-    nameText.style.color = 'white'; // Make sure name is visible on dark bg
-    
-    // Append elements to button
     button.appendChild(imgContainer);
-    button.appendChild(nameText);
     
-    // Use the main game flow with our audio files
-    button.addEventListener('click', () => selectAnswer(celeb));
+    // Add celebrity name
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = celeb;
+    nameSpan.style.fontSize = '0.8rem';
+    nameSpan.style.textAlign = 'center';
+    nameSpan.style.maxWidth = '100%';
+    nameSpan.style.overflow = 'hidden';
+    nameSpan.style.textOverflow = 'ellipsis';
+    nameSpan.style.whiteSpace = 'nowrap';
+    button.appendChild(nameSpan);
+    
+    // Add click handler
+    button.addEventListener('click', () => handleCelebrityClick(celeb));
     
     container.appendChild(button);
   });
   
-  // Start the timer
-  startTimer();
-  
-  // Update timers and other UI
-  window.logDiagnostic(`Game ready with ${celebrities.length} celebrities - timer started`);
-  return `Added ${celebrities.length} celebrity buttons with dark backgrounds and yellow outlines`;
+  window.logDiagnostic(`Created ${quoteData.celebrities.length} celebrity buttons for ${category}`);
 };
 
 // Add a function to test receiving game data - COMPLETELY REWRITTEN FOR RELIABILITY
@@ -3387,22 +3208,16 @@ function createButtonsFromQuoteData(quoteData) {
       img.style.objectFit = 'cover';
       img.alt = celebrity;
       
-      // Create clean filename for the image - handle special characters and spaces
-      const imageFilename = celebrity.toLowerCase()
-        .replace(/é/g, 'e')   // Replace é with e
-        .replace(/[^\w\s-]/g, '') // Remove any other special characters
-        .replace(/\s+/g, '-')     // Replace spaces with hyphens
-        .trim();
+      // Get image path from imageFiles map
+      const imagePath = imageFiles[celeb];
+      img.src = imagePath;
       
-      // Set the image source using the assets/celebrities directory
-      img.src = `assets/celebrities/${imageFilename}.jpg`;
+      // Log image loading
+      window.logDiagnostic(`Setting image for ${celeb}: ${imagePath}`);
       
-      // Log the image path for debugging
-      window.logDiagnostic(`Setting image path: ${img.src} for ${celebrity}`);
-      
-      // If image fails to load, create a fallback with initials
+      // Handle image load error with fallback to initials
       img.onerror = () => {
-        window.logDiagnostic(`Image load failed for ${celebrity}, using initials fallback`);
+        window.logDiagnostic(`Image load failed for ${celeb}, using initials fallback`);
         img.style.display = 'none';
         
         // Create a fallback with initials
@@ -3417,7 +3232,7 @@ function createButtonsFromQuoteData(quoteData) {
         initials.style.fontSize = '18px';
         
         // Get initials from celebrity name
-        const initialsText = celebrity
+        const initialsText = celeb
           .split(' ')
           .map(word => word.charAt(0))
           .join('')
@@ -3427,7 +3242,7 @@ function createButtonsFromQuoteData(quoteData) {
         imgContainer.appendChild(initials);
       };
       
-      // Add the image to its container
+      // Add image to container
       imgContainer.appendChild(img);
       
       // Add enhanced hover effects
@@ -3822,73 +3637,50 @@ function initializeBackground() {
 }
 
 // Add a diagnostic function that will run automatically
-window.verifyAudioFiles = function() {
-  window.logDiagnostic("Verifying audio files...");
-  
-  // Array of celebrities to check
-  const celebsToCheck = ["Bono", "Taylor Swift", "Beyoncé", "John Lennon", "Bob Dylan", "Lady Gaga"];
-  
-  // Results container for diagnostics
-  const results = [];
-  
-  // Check each celebrity
-  celebsToCheck.forEach(celeb => {
-    // Generate file path
-    const fileName = celeb.toLowerCase().replace(/\s+/g, '_').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    const path = `audio/music/${fileName}_music.mp3`;
-    
-    // Create a test audio element
-    const testAudio = new Audio(path);
-    
-    // Check if the file loads
-    testAudio.addEventListener('canplaythrough', () => {
-      results.push(`✓ ${celeb}: ${path} - File loaded successfully`);
-      window.logDiagnostic(`✓ ${celeb} audio loaded successfully`);
-      
-      // If all checks are complete, log results
-      if (results.length === celebsToCheck.length) {
-        logAudioResults(results);
-      }
-    }, { once: true });
-    
-    // Check for errors
-    testAudio.addEventListener('error', () => {
-      const error = testAudio.error ? testAudio.error.message : 'Unknown error';
-      results.push(`✗ ${celeb}: ${path} - Error: ${error}`);
-      window.logDiagnostic(`✗ ${celeb} audio error: ${error}`);
-      
-      // If all checks are complete, log results
-      if (results.length === celebsToCheck.length) {
-        logAudioResults(results);
-      }
-    }, { once: true });
-    
-    // Force load attempt
-    testAudio.load();
-  });
-  
-  // Log the results after a timeout if not all files reported back
-  setTimeout(() => {
-    if (results.length < celebsToCheck.length) {
-      const remaining = celebsToCheck.length - results.length;
-      results.push(`⚠ ${remaining} file(s) did not report back in time`);
-      logAudioResults(results);
-    }
-  }, 5000);
-  
-  // Helper function to log results
-  function logAudioResults(results) {
-    console.log("Audio File Verification Results:");
-    results.forEach(result => console.log(result));
-    
-    window.logDiagnostic(`Audio verification complete: ${results.filter(r => r.startsWith('✓')).length}/${celebsToCheck.length} files OK`);
-    
-    // If any errors, provide more diagnostic info
-    if (results.some(r => r.startsWith('✗'))) {
-      window.logDiagnostic("⚠ Some audio files failed to load. Check paths or CORS issues.");
-    }
+window.verifyAudioFiles = function(quoteData) {
+  if (!quoteData || !quoteData.audioClips) {
+    console.error('No audio clips data provided');
+    return;
   }
-};
+
+  const results = [];
+  Object.entries(quoteData.audioClips).forEach(([celebrity, path]) => {
+    const audio = new Audio(path);
+    audio.onerror = () => {
+      console.error(`✗ ${celebrity} audio error:`, audio.error);
+      results.push({
+        celebrity,
+        path,
+        error: audio.error.message
+      });
+    };
+    audio.oncanplaythrough = () => {
+      console.log(`✓ ${celebrity} audio loaded successfully`);
+      results.push({
+        celebrity,
+        path,
+        success: true
+      });
+    };
+    audio.load();
+  });
+
+  console.log('Audio File Verification Results:');
+  results.forEach(result => {
+    if (result.success) {
+      console.log(`✓ ${result.celebrity}: ${result.path}`);
+    } else {
+      console.log(`✗ ${result.celebrity}: ${result.path} - Error: ${result.error}`);
+    }
+  });
+
+  const successCount = results.filter(r => r.success).length;
+  console.log(`Audio verification complete: ${successCount}/${results.length} files OK`);
+  
+  if (successCount < results.length) {
+    console.warn('⚠ Some audio files failed to load. Check paths or CORS issues.');
+  }
+}
 
 // Start the timer
 function startTimer() {
@@ -4887,4 +4679,51 @@ function enableGameAudio() {
     window.logDiagnostic(`Error enabling game audio: ${err.message}`);
     return false;
   }
+}
+
+function handleStartButtonClick() {
+  window.logDiagnostic('Start button clicked - initializing audio and starting game');
+  
+  // Verify critical game elements
+  const requiredElements = [
+    { name: 'Game Play Screen', id: 'game-play' },
+    { name: 'Celebrities Container', id: 'celebrities-container' },
+    { name: 'Quote Text', id: 'quote-text' },
+    { name: 'Timer Bar', id: 'timer-bar' },
+    { name: 'Timer Text', id: 'timer-text' },
+    { name: 'Timer Container', id: 'timer-container' }
+  ];
+  
+  let allElementsFound = true;
+  requiredElements.forEach(({ name, id }) => {
+    const element = document.getElementById(id);
+    if (element) {
+      window.logDiagnostic(`FOUND: ${name} (${id})`);
+    } else {
+      window.logDiagnostic(`MISSING: ${name} (${id})`);
+      allElementsFound = false;
+    }
+  });
+  
+  if (!allElementsFound) {
+    window.logDiagnostic('ERROR: Some required elements are missing');
+    return;
+  }
+  
+  window.logDiagnostic('All critical game elements are present');
+  
+  // Initialize audio
+  enableGameAudio();
+  
+  // Request game data
+  window.logDiagnostic('Sending readyForGameData message after button click');
+  sendMessage({ type: 'readyForGameData' });
+  
+  // Set a timeout to retry if no response
+  setTimeout(() => {
+    if (!window.gameDataReceived) {
+      window.logDiagnostic('No game data received, retrying...');
+      sendMessage({ type: 'readyForGameData' });
+    }
+  }, 1000);
 }
